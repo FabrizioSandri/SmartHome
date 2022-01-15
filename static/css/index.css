@@ -1,0 +1,36 @@
+
+#appcontainer{
+    padding: 20px;
+}
+
+#title{
+    font-weight: 300;
+}
+
+.card-title {
+    font-weight: bold;
+}
+
+@media only screen and  (max-width: 30em) {
+    .card {
+        width: 100%;
+    }  
+}
+
+@media only screen and  (min-width: 31em) {  
+    .card {
+        width: 18rem;
+    } 
+}
+
+.card{
+    padding: 1.5em .5em .5em;
+    border-radius: 2em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    margin-bottom: 10px;
+}
+
+.top_img{
+    color: rgb(66, 66, 66);
+}

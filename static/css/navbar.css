@@ -1,0 +1,30 @@
+.nav-link {
+    color: white;
+    font-weight: bold;
+    font-size: large;
+}
+.nav-link:hover {
+    color: grey;
+}
+
+.navbar-brand{
+    color: white;
+    font-weight: bolder;
+    padding-right: 20px;
+    border-right: 2px solid grey;
+}
+.navbar-brand:hover {
+    color: white;
+}
+
+.fas {
+    color: white;
+}
+
+.navbar{
+    margin-bottom: 5px;
+}
+
+.fa-home{
+    margin-right: 5px;
+}
