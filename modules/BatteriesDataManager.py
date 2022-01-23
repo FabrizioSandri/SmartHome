@@ -91,8 +91,12 @@ class BatteriesDataManager:
         requestUrl = self.gateway_ip + "/api/system_status/soe"
 
         jsonResponse = self.teslaRequest(requestUrl)
+        
+        apiPercentage = jsonResponse["percentage"]
+        # fix app percetange different from gateway percentage : app = (api - 5)/0.95
+        appPercentage = (apiPercentage - 5)/0.95
 
-        return round(jsonResponse["percentage"], 1)
+        return round(appPercentage, 1)
 
     
     '''
@@ -163,7 +167,7 @@ class BatteriesDataManager:
         response = urllib.request.urlopen(requestUrl)
         jsonResponse = json.loads(response.read())
     
-        result = str(jsonResponse["energy"]["values"][0]["value"]/1000) # W -> kW
+        result = str(int(jsonResponse["energy"]["values"][0]["value"] or 0)/1000) # W -> kW
 
         return result
 
