@@ -221,8 +221,8 @@ class WeatherDataManager:
 
         # return
         data = {
-            "forecastIcon": forecastIcon,
-            "forecastRule": forecast[forecastRule],
+            "forecastIcon": forecast["forecastIcon"][forecastIcon],
+            "forecastRule": forecast["forecastRule"][forecastRule],
             "outTemp": outTemp,
             "inTemp": inTemp,
             "windSpeed": windSpeed,

@@ -1,0 +1,270 @@
+<html>
+    <head>
+        <title>Meteo</title>
+        
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+                
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+
+        <script>
+            function generateDownloadHistoryOptions(){
+                var optionMese = document.getElementById("mese");
+                var optionAnno = document.getElementById("anno");
+
+                var currentYear = new Date().getFullYear();
+                var startYear = 2021; // dati dal 2021 in poi
+
+                var years = [];
+                var months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+                while (startYear <= currentYear){
+                    years.push(startYear++);
+                }
+
+                years.forEach((year) => {
+                    let optionYear = document.createElement("option");
+                    optionYear.setAttribute("value", "" + year);
+                    optionYear.innerText = year;
+
+                    optionAnno.appendChild(optionYear);
+                });
+
+                months.forEach((month) => {
+                    let optionMonth = document.createElement("option");
+                    optionMonth.setAttribute("value", "" + month);
+                    optionMonth.innerText = month;
+
+                    optionMese.appendChild(optionMonth);
+                });
+            }
+
+            // get forecast for today
+            function getForecast() {
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200){
+                        
+                        let result = JSON.parse(this.responseText);
+
+                        let forecast_icon = result["forecastIcon"];
+                        let forecast_rule = result["forecastRule"];
+                        let outTemp = parseFloat(result["outTemp"]).toFixed(2);
+                        let inTemp = parseFloat(result["inTemp"]).toFixed(2);
+                        let windSpeed = parseFloat(result["windSpeed"]).toFixed(2);
+                        let pressure = parseFloat(result["pressure"]).toFixed(2);
+                        let outHumidity = parseFloat(result["outHumidity"]).toFixed(2);
+                        let sunrise = result["sunrise"];
+                        let sunset = result["sunset"];
+                        
+                        document.getElementById("forecasticon").classList = `fas fa-3x fa-${forecast_icon[0]}`;
+                        if (forecast_icon.length >= 2){  // snow
+                            document.getElementById("snow").style.visibility = "visible";;
+                        }else {
+                            document.getElementById("snow").style.visibility = "hidden";;
+                        }
+                        
+                        document.getElementById("forecastrule").innerText = forecast_rule;
+                        document.getElementById("outTemp").innerText = outTemp + " °C";
+                        document.getElementById("inTemp").innerText = inTemp + " °C";
+                        document.getElementById("windSpeed").innerText = windSpeed + " km/h";
+                        document.getElementById("pressure").innerText = pressure + " hPa";
+                        document.getElementById("outHumidity").innerText = outHumidity + " %";
+                        document.getElementById("sunrise").innerText = sunrise;
+                        document.getElementById("sunset").innerText = sunset;
+                    }
+                }
+
+                xhttp.open("GET", "weather/getForecast", true);
+                xhttp.send();
+            }
+        </script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <style>
+            .card{
+                padding: 1.5em .5em .5em;
+                border-radius: 2em;
+                text-align: center;
+                box-shadow: 0 5px 10px rgba(0,0,0,.2);
+                width: 40rem;
+                margin-bottom: 10px;
+            }
+            
+            .second-row{
+                border-top: 1px solid gray;
+                padding-top: 1em;
+                margin-top: 1em;
+            }
+
+            #forecasticon, #snow {
+                color: rgb(66, 66, 66);
+            } 
+
+            #snow {
+                visibility: hidden;
+            }
+
+            @media only screen and  (min-width: 43em) {  
+                .forecast {
+                    border-left: 1px solid gray;
+                }
+            }
+
+        </style>
+    
+    </head>
+    <body>
+        <!-- Nav Bar -->
+        {% include "navBar.html" %}
+        
+        <!-- Page content -->
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title">Meteo casa {{ vars["house_name"] }}</h1>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h2 id="outTemp" class="display-3"><strong >- °C</strong></h2>
+                                <p class="text-muted mb-0">Revò, Novella - Trentino</p>
+                            </div>
+                            <div class="forecast col-md-6">
+                                <div class="row justify-content-center" style="margin-bottom: 0.5em;">
+                                    <i id="forecasticon" class="fas fa-cloud-sun fa-3x"></i>
+                                    <i id="snow" class="fas fa-snowflake fa-2x"></i>
+                                </div>
+                                <p id="forecastrule"></p>
+                            </div>
+                        </div>
+
+                        
+                        <div class="row second-row">
+                            <div class="col-md-6">
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Temperatura interna</legend>
+                                    <p id="inTemp">
+                                        <strong>- °C</strong>
+                                    </p>
+                                </fieldset>
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Vento</legend>
+                                    <p id="windSpeed">
+                                        <strong>- km/h</strong>
+                                    </p>
+                                </fieldset>
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Alba</legend>
+                                    <p id="sunrise">
+                                        <strong></strong>
+                                    </p>
+                                </fieldset>
+                            </div>
+                            <div class="col-md-6 forecast">
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Umidità esterna</legend>
+                                    <p id="outHumidity">
+                                        <strong>- %</strong>
+                                    </p>
+                                </fieldset>
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Pressione</legend>
+                                    <p id="pressure">
+                                        <strong>- hPa</strong>
+                                    </p>
+                                </fieldset>
+                                <fieldset class="border p-2">
+                                    <legend  class="h5">Tramonto</legend>
+                                    <p id="sunset">
+                                        <strong></strong>
+                                    </p>
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="card text-center">
+                    <h3>Previsioni</h3>
+                    <iframe src="{{ weather['3bmeteo_iframe_address'] }}" width=100% height=192 frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <hr />
+            <h2>Visualizza dati giornalieri</h2>
+            <p>
+                Selezionare il giorno per cui si vogliono visualizzare i dati. <br />
+                Utilizzare il parametro opzionale precisione per specificare la densità di dati da visualizzare(default: ogni 20 secondi)
+            </p>
+
+            <form method="POST" action="/weather">
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <label for="day">Giorno</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="date" id="day" name="date" placeholder="Data">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label for="precision">Precisione in secondi</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="number" id="precision" name="precision" placeholder="precision">
+                    </div>
+                </div>
+
+                <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
+            </form>
+
+            <hr />
+            
+            <h2>Scarica i dati mensili</h2>
+            <p>
+                Selezionare il mese e anno per cui si vogliono scaricare i dati. <br />
+                Specificare la precisione in secondi corrispondente alla densità di dati da scaricare. 
+                <br />
+                ES: Specificare 300 se si vuole che venga ritornato il dataset con una precisione di 5 minuti,
+                ovvero una misurazione ogni 5 minuti.
+                <br /><br />
+                <b>NOTA:</b> ci vorra del tempo per generare il file CSV. (Qualche minuto - attendi)
+            </p>
+
+            <form method="GET" action="/weather/historicalMonth">
+                
+                <select id="mese" name="mese"></select>
+                <select id="anno" name="anno"></select>
+
+                <label for="precisionMonth">Precisione in secondi</label>
+                <input type="number" id="precisionMonth" name="precisionMonth" placeholder="Precisione in secondi">
+                <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+
+            </form>
+            
+        </div>
+
+        <script>
+            getForecast();
+            setInterval(getForecast, 2000);
+            generateDownloadHistoryOptions();
+        </script>
+
+    </body>
+</html>
