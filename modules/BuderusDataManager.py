@@ -89,7 +89,7 @@ class BuderusDataManager:
             if c == 0:
                 measure.append(0)
             else:
-                measure.append(float(value) / float(c))
+                measure.append(round(float(value) / float(c) , 0))
                 
 
         consumedEnergy = {
@@ -118,7 +118,7 @@ class BuderusDataManager:
             if c == 0:
                 measure.append(0)
             else:
-                measure.append(float(value) / float(60) )
+                measure.append(round(float(value) / float(60) , 0) )
                 
 
         consumedEnergy = {
