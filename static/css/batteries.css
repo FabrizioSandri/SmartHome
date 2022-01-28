@@ -89,4 +89,19 @@
 
 #production-chart{
     max-height: 30em;
+    min-height: 30em;
+}
+
+.compare_btn{
+    margin: 0.5em;
+}
+
+@media only screen and  (min-width: 57em) {  
+    .compare {
+        border-left: 1px solid gray;
+    }
+}
+
+.produced_label{
+    margin-top: 2px;
 }
