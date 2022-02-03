@@ -1,0 +1,91 @@
+{% set solar = teslaData["aggregates"]["solar"]["instant_power"] %}
+{% set site = teslaData["aggregates"]["site"]["instant_power"] %}
+{% set load = teslaData["aggregates"]["load"]["instant_power"] %}
+{% set battery = teslaData["aggregates"]["battery"]["instant_power"] %}
+
+<svg viewBox="-5 -5 510 510" >
+    <defs>
+      <style>
+            .connectionline {
+                fill: none;
+                stroke: #231F20;
+                stroke-width: 2;
+                stroke-dasharray: 11, 5; 
+            }
+
+            marker {
+                fill: black;
+            }
+      </style>
+    
+    </defs>
+    
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+        markerWidth="8" markerHeight="8"
+        orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+
+    <!-- Cerchi -->
+    <circle cx="250" cy="50" r="50" stroke="#F57F17" fill="#FBC02D" fill-opacity="0.4" stroke-width="3"/>
+    <text x="250" y="40" text-anchor="middle" font-weight="bold">Solare</text>
+    <text x="250" y="70" text-anchor="middle">{{ solar | abs }} kW</text>
+
+    <circle cx="50" cy="250" r="50" stroke="#212121" fill="#616161" fill-opacity="0.4" stroke-width="3"/>
+    <text x="50" y="240" text-anchor="middle" font-weight="bold">Rete</text>
+    <text x="50" y="270" text-anchor="middle">{{ site | abs }} kW</text>
+
+    <circle cx="450" cy="250" r="50" stroke="#01579B" fill="#0288D1" fill-opacity="0.4" stroke-width="3"/>
+    <text x="450" y="240" text-anchor="middle" font-weight="bold">Casa</text>
+    <text x="450" y="270" text-anchor="middle">{{ load | abs }} kW</text>
+
+    <circle cx="250" cy="450" r="50" stroke="#33691E" fill="#689F38" fill-opacity="0.4" stroke-width="3"/>
+    <text x="250" y="440" text-anchor="middle" font-weight="bold">Batterie</text>
+    <text x="250" y="470" text-anchor="middle">{{ battery | abs }} kW</text>
+
+
+
+    <!-- Solare -> Rete --> 
+    {% if solar|abs > load|abs + battery|abs and site < 0 %}
+    <path class="connectionline" d="m 214.6447 85.35534 l -129.2893 129.2893" 
+        marker-end="url(#arrow)" 
+    /> 
+    {% endif %}
+
+    <!-- Batteria -> Casa --> 
+    {% if load|abs > solar|abs + site and battery > 0 %}
+    <path class="connectionline" d="m 285.3553 414.6447 l 129.2893 -129.2893"
+        marker-end="url(#arrow)" 
+    /> 
+    {% endif %}
+
+    <!-- Casa -> Solare --> 
+    {% if load|abs > 0 and solar|abs > 0 %}
+    <path class="connectionline" d="m 414.6447 214.6447 l -129.2893 -129.2893"
+        marker-start="url(#arrow)"
+    /> 
+    {% endif %}
+    
+    <!-- Solare -> Batteria --> 
+    {% if solar|abs > load|abs and battery < 0 %}
+    <path class="connectionline" d="m 250 100 l 0 300" 
+        marker-end="url(#arrow)" 
+    />
+    {% endif %}
+
+    <!-- Rete -> Casa --> 
+    {% if solar|abs + battery|abs < load|abs and site > 0 %}
+    <path class="connectionline" d="m 100 250 l 300 0"
+        marker-end="url(#arrow)" 
+    />
+    {% endif %}
+
+    <!-- Rete -> Batterie --> 
+    {% if battery < 0 and site > 0 and load < site %}
+    <path class="connectionline" d="m 85.3554 285.3554 l 129.2893 129.2893" 
+        marker-end="url(#arrow)" 
+    />
+    {% endif %}
+    
+
+  </svg>
