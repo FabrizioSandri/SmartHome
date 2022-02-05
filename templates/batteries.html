@@ -1,0 +1,271 @@
+{% set solar = teslaData["aggregates"]["solar"]["instant_power"] %}
+{% set site = teslaData["aggregates"]["site"]["instant_power"] %}
+{% set load = teslaData["aggregates"]["load"]["instant_power"] %}
+{% set battery = teslaData["aggregates"]["battery"]["instant_power"] %}
+
+{% if battery > 0 %}
+    {% set dischargeEstimation = (27 * teslaData['batteryPercentage']/100) / battery|abs %}
+{% elif battery < 0 %}
+    {% set chargeEstimation = (27 - 27 * teslaData['batteryPercentage']/100) / battery|abs %}
+{% endif %}
+
+<html>
+    <head>
+        <title>Impianto solare</title>
+
+        <script  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+             
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/batteries.css') }}">
+
+        <script src="{{ url_for('static', filename='js/batteries.js') }}" ></script>
+
+        
+        <style>
+            #batterypercentageprogress{
+                width: {{ teslaData['batteryPercentage'] }}%
+            }
+        </style>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+    </head>
+    <body>
+
+        <!-- Nav Bar -->
+        {% include "navBar.html" %}
+        
+        <!-- Page content -->
+        <div class="container pagecontainer">
+            <div class="row">
+
+                <div class="col-md-5">
+                    <div class="card">
+                        <h2>Impianto solare casa {{ vars["house_name"] }}</h2>
+                        <hr />
+                        <div>
+                            <div class="col">
+                                <div class="row">
+                                    <div class="container panel" id="panel">
+                                        <!-- energy usage chart -->
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="progress progress-bar-horizontal">
+                                            <div class="progress-bar progress-bar-striped bg-success" id="batterypercentageprogress" role="progressbar" aria-valuenow="{{ teslaData['batteryPercentage'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            <h5 class="justify-content-center d-flex position-absolute w-100" id="batterypercentage">{{ teslaData['batteryPercentage'] }}%</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <hr />
+                        <div class="container" style="text-align: center;">
+                            <p>Versione: {{ teslaData["version"] }}</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Stato batterie</h4>
+        
+                        {% if teslaData['batteryPercentage'] == 100 %}
+                            Le batterie sono cariche
+                        {% else %}
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>Stato</td>
+                                    <td>
+                                        {% if battery < 0 %}
+                                            caricando
+                                        {% else %}
+                                            scaricando
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    {% if battery < 0 %}
+                                        <td>Tempo carica stimato</td>
+                                        <td>{{ chargeEstimation | round(1) }} ore</td>
+                                    {% elif battery > 0 %}
+                                        <td>Tempo scarica stimato</td>
+                                        <td>{{ dischargeEstimation | round(1) }} ore</td>
+                                    {% else %}
+                                        <td>Tutto ciò che è prodotto è pure consumato</td>
+                                        <td></td>
+                                    {% endif %}
+                                </tr>
+                                
+                            </tbody>                   
+                        </table>
+                        {% endif %}
+                    </div>
+                </div>
+    
+                <!-- DETTAGLI IMPIANTO -->
+                <div class="col-md-7">
+                    <div class="card">
+                        <h2>Dettagli impianto</h2>
+                        <table class="table">
+                            
+                            <tbody>
+                                <tr>
+                                    <td>Potenza solare attuale</td>
+                                    <td>{{ solar | abs }} kW</td>
+                                </tr>
+                                <tr>
+                                    <td>Energia generata oggi</td>
+                                    <td>{{ siteDetails["lastDayEnergy"] }} kWh</td>
+                                </tr>
+                                <tr>
+                                    <td>Totale energia mensile</td>
+                                    <td>{{ siteDetails["lastMonthEnergy"] }} kWh</td>
+                                </tr>
+                                <tr>
+                                    <td>Totale energia anno</td>
+                                    <td>{{ siteDetails["lastYearEnergy"] }} kWh</td>
+                                </tr>
+                            </tbody>                   
+        
+                        </table>
+        
+                    </div>
+
+                    <div class="card">
+                        <!-- RESISTENZA BOOST -->
+                        <div class="container">
+                            <h3>Resistenza ( <span id="reducerstatus"></span><span id="reducerremainingtime"></span> )</h4>
+        
+                            <div class="row">
+                                
+                                <div class="col col-resistenza">
+                                    <h5>Cambia stato della resistenza</h5>
+                                    <div>
+                                        <input type="radio" id="setoff" name="switchresistenza" value="off">
+                                        <label for="setoff">Off</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" id="setauto" name="switchresistenza" value="auto">
+                                        <label for="setauto">Automatico (vedi timer settimanale)</label>
+                                    </div>
+                                    
+                                    <input type="button" class="btn btn-secondary" value="Cambia stato" name="changestatus" id="changestatus" onclick="changePowerReducerStatus()">
+                                    <p id="switchresult"></p>
+                                        
+                                </div>
+        
+                                <div class="col col-resistenza">
+                                    <h5>Boost</h5>
+                                    <p>
+                                        Attiva la resistenza in boost fino alle ore
+                                    </p>
+                                    <input type="text" id="endtime" name="endtime" placeholder="hh:mm">
+                                    <input type="button" class="btn btn-secondary" value="Boost" name="boost" id="boost" onclick="sendBoost()">
+                                    <p id="boostresult"></p>
+                                </div>
+        
+                            </div>
+                        </div>
+        
+                        <hr />
+        
+                        <!-- TIMER SETTIMANALE -->
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <button class="btn btn-secondary" onclick="getScheduleTimer()">Visualizza timer settimanale</button>
+                                </div>
+                            </div>
+                            <div class="row" id="schedule_legend" hidden>
+                                Legenda:
+                                <div class="timeslot slot0"></div> OFF
+                                <div class="timeslot slot1"></div> BOOST
+                                <div class="timeslot slot2"></div> AUTO
+                            </div>
+                            <div id="schedule">
+                                <!-- schedule -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PRODUZIONE GIORNALIERA -->
+                    <div class="card">
+                        <div class="container">
+                            <h3>Produzione giornaliera</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5> Energia prodotta in data </h5>
+                                    <div class="row justify-content-center">
+                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(-1, 'day_production')">
+                                            <span class="fas fa-caret-left"></span>
+                                        </button>
+                                        <input class="row" type="date" id="day_production" name="day_production" placeholder="dd-mm-yyyy" onchange="generateProductionChartData(false)">
+                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(1, 'day_production')">
+                                            <span class="fas fa-caret-right"></span>
+                                        </button>
+                                    </div>
+                                    <h5 class="produced_label">
+                                        Produzione: <span id="dailyenergygenerated"></span>
+                                    </h5>
+                                    
+                                </div>
+                                <div class="col-md-6 compare">
+                                    <h5>Confronta con</h5>
+                                    <div class="row justify-content-center">
+                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(-1, 'day_production_compare')">
+                                            <span class="fas fa-caret-left"></span>
+                                        </button>
+                                        <input class="row" type="date" id="day_production_compare" name="day_production_compare" placeholder="dd-mm-yyyy" onchange="generateProductionChartData(true)">
+                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(1, 'day_production_compare')">
+                                            <span class="fas fa-caret-right"></span>
+                                        </button>
+                                    </div>
+
+                                    <h5 class="produced_label">
+                                        Produzione: <span id="dailyenergygenerated_compare">0 kWh</span>
+                                    </h5>
+
+                                    <div class="row justify-content-center">
+                                        <button class="btn btn-secondary compare_btn" type="button" onclick="generateProductionChartData(true)">Confronta</button>
+                                        <button class="btn btn-alert compare_btn" type="button" onclick="generateProductionChartData(false)">Rimuovi confronto</button>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <canvas id="production-chart"></canvas>
+
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <script>
+            today = new Date();
+            document.getElementById("day_production").value = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+            
+            generateProductionChartData();
+            getCurrentUsageGraph();
+            getE4uOnlineData();
+            setInterval(getCurrentUsageGraph, 1000);
+            setInterval(getBatteryPercentage, 5000);
+            setInterval(getE4uOnlineData, 5000);
+        </script>
+        
+
+    </body>
+</html>
