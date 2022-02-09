@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <title>Caldaia Buderus</title>
+
+        <script  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+             
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/buderus.css') }}">
+
+        <script src="{{ url_for('static', filename='buderusCharts.js') }}" ></script>
+        <script src="{{ url_for('static', filename='js/buderus.js') }}" ></script>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    </head>
+    <body>
+        <!-- Nav Bar -->
+        {% include "navBar.html" %}
+        
+        <!-- dati impianto -->
+        <div class="container">
+            <h2>Dettagli impianto Buderus</h2>
+            <hr />
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Informazioni impianto</h4>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <td>Temperatura esterna</td>
+                                <td id="temperaturaEsterna"></td>
+                            </tr>
+                            <tr>
+                                <td>Modulazione attuale</td>
+                                <td id="modulazionePompa"></td>
+                            </tr>
+                            <tr>
+                                <td>Temepratura mandata</td>
+                                <td id="temperaturaMandata"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h4>Acqua calda</h4>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <td>Setpoint attuale</td>
+                                <td id="setpointAttuale"></td>
+                            </tr>
+                            <tr>
+                                <td>Temperatura attuale</td>
+                                <td id="temperaturaAttuale"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- dati heatingCircuits -->
+        <div class="container">
+            <h4>Circuiti di riscaldamento</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Piano 1</th>
+                        <th>Piano 2</th>
+                        <th>Piano 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="setPointAmbiente">
+                        <td>Set point ambiente</td>
+                    </tr>
+                    <tr id="temperaturaAmbiente">
+                        <td>Temperatura ambiente</td>
+                    </tr>
+                    <tr id="temperaturaMandataHc">
+                        <td>Temperatura mandata</td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- dati giornalieri -->
+        <div class="container-fluid card">
+            <div class="card-header row">
+                <div class="col-md-3">
+                    <h4>Dati giornalieri</h4>
+                </div>
+                <div class="col-md-9">
+                    <label for="day">Giorno: </label>
+                    <input type="date" id="day" name="date" placeholder="Data">
+                    <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati" onclick="displayDailyCharts()">
+                </div>
+            </div>
+            
+            
+
+            <div class="row card-body">
+                <div class="col-md-6 text-center card">
+                    <h5>Energia consumata</h5>
+                    <h6 id="totalDailyConsumed"></h6>
+                    <div class="card-body">
+                        <canvas id="energyConsumed-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center card">
+                    <h5>Temperature circuiti</h5>
+                    <div class="card-body">
+                        <canvas id="temp-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- dati mensili -->
+        <div class="container-fluid card">
+            <div class="card-header row">
+                <div class="col-md-3">
+                    <h4>Dati mensili</h4>
+                </div>
+                <div class="col-md-9">
+                    <label for="mese">Mese: </label>
+                    <select id="mese" name="mese"></select>
+                    <select id="anno" name="anno"></select>
+                    <input type="submit" name="getDataMonthly" class="btn btn-secondary" value="Visualizza dati" onclick="getConsumedEnergyMonthly()">
+                </div>
+            </div>
+            
+            <div class="row card-body">                
+                <div class="col-md-6 text-center card">
+                    <h5>Energia mensile consumata</h5>
+                    <h6 id="totalMonthlyConsumed"></h6>
+                    <div class="card-body">
+                        <canvas id="energyConsumedMonthly-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 card">
+                    <div class="card-body">
+                        <h5>Download dati</h5>
+                        <p>
+                            Selezionare il mese e anno per cui si vogliono scaricare i dati. <br />
+                            <br /><br />
+                            <b>NOTA:</b> ci vorra del tempo per generare il file CSV. (attendi)
+                        </p>
+            
+                        <form method="GET" action="/buderus/downloadMonthlyPowerConsume">
+                            
+                            <select id="mesedownload" name="mese"></select>
+                            <select id="annodownload" name="anno"></select>
+            
+                            <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+            
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <script>
+            today = new Date();
+            document.getElementById("day").value = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+
+            getHeaderData();
+            displayDailyCharts();
+            generateOptionsMonthly("mese", "anno");
+            generateOptionsMonthly("mesedownload", "annodownload");
+        </script>
+    </body>
+</html>
+
