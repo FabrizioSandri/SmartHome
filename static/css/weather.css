@@ -1,0 +1,16 @@
+canvas{
+    height: 400px;
+}
+
+.right-hr {
+    border-right: 1px solid gray;
+}
+
+.container {
+    min-width: 90%;
+}
+
+.arrow {
+    margin-left: 1em;
+    margin-right: 1em;
+}

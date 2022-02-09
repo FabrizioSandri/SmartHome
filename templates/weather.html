@@ -1,0 +1,169 @@
+<html>
+    <head>
+        <title>Meteo</title>
+
+        <script  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+             
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/weather.css') }}">
+
+        <script src="{{ url_for('static', filename='weatherCharts.js') }}" ></script>
+
+        <script>
+            function changeDay(direction) {
+                let dateValue = document.getElementById("day").value;
+                let date = new Date(dateValue);
+                
+                date.setDate( date.getDate() + direction );
+                reqDate = date.toISOString().split('T')[0];
+                
+                // redirect
+                location.href = '/weather?date='+reqDate;
+                
+            }
+        </script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+    </head>
+    <body>
+        <!-- Nav Bar -->
+        {% include "navBar.html" %}
+        
+        <!-- Page content -->
+        <h2>Stazione meteo Davis - casa {{ vars["house_name"] }}</h2>
+        <hr />
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 right-hr">
+                    <form method="POST" action="/weather">
+                        <div class="row">
+                            <h4>Seleziona un altro giorno</h4>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="row" for="day">Giorno: </label>
+                            </div>
+                            <div class="col">
+                                <div class="row">
+                                    <button class="btn btn-secondary arrow" type="button" onclick="changeDay(-1)">
+                                        <span class="fas fa-caret-left"></span>
+                                    </button>
+                                    <input class="row" type="date" id="day" name="date" placeholder="Data" value="{{date}}">
+                                    <button class="btn btn-secondary arrow" type="button" onclick="changeDay(1)">
+                                        <span class="fas fa-caret-right"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <label class="row" for="precision">Precisione in secondi: </label>
+                            </div>
+                            <div class="col">
+                                <input class="row" type="number" id="precision" name="precision" placeholder="precision">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
+                        </div>
+                    </form>
+
+                </div>
+                <div class="col-md-4">
+                    <h4>Scarica i dati di oggi</h4>
+                    <form method="GET" action="/weather/historical">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="precisionhistorical">Precisione in secondi: </label>
+                                </div>
+                                <div class="col">
+                                    <input type="number" id="precisionhistorical" name="precisionhistorical" placeholder="Precisione in secondi">
+                                    <input type="hidden" name="datehistorical" value="{{date}}">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <input type="submit" name="getHistory" class="btn btn-secondary" value="Scarica dati">
+                            </div>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-md-5">
+                    <canvas id="wind-chart"></canvas>
+                </div>
+                <div class="col-md-5">
+                    <canvas id="temp-chart"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <canvas id="barometer-chart"></canvas>
+                </div>
+                <div class="col-md-5">
+                    <canvas id="humidity-chart"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <canvas id="rain-chart"></canvas>
+                </div>
+                <div class="col-md-5">
+                    
+                    <div class="container">
+                        <h4>Statistiche</h4>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Max</th>
+                                    <th>Min</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Temperatura esterna</td>
+                                    <td>{{ statistics["max_outTemp"] }} °C</td>
+                                    <td>{{ statistics["min_outTemp"] }} °C</td>
+                                </tr>
+                                <tr>
+                                    <td>Temperatura interna</td>
+                                    <td>{{ statistics["max_inTemp"] }} °C</td>
+                                    <td>{{ statistics["min_inTemp"] }} °C</td>
+                                </tr>
+                                <tr>
+                                    <td>Velocità vento</td>
+                                    <td>{{ statistics["max_windSpeed"] }} km/h</td>
+                                    <td>{{ statistics["min_windSpeed"] }} km/h</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            displayCharts({{ chartData | safe }});
+        </script>
+        
+
+    </body>
+</html>

@@ -1,0 +1,107 @@
+#reducerstatus {
+    color: crimson;
+}
+
+.timeslot {
+    width: 2ch;
+    height: 2ch;
+    border: 1px solid black;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.hourslot {
+    width: 8ch;
+    height: 2ch;
+    border-left: 1px solid black;
+    margin-bottom: 2px;
+    font-weight: bold;
+}
+
+.slot0 { 
+    background-color: green;
+}
+
+.slot1 {
+    background-color: red;
+}
+
+.slot2 {
+    background-color: yellow;
+}
+
+.dayLabel {
+    width: 10ch;
+}
+
+.panel, svg{
+    max-height: 500px;
+}
+
+.panel {
+    margin-bottom: 1rem;
+}
+
+.card{
+    padding: 1.5em .5em .5em;
+    border-radius: 2em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    margin-bottom: 10px;
+}
+
+@media only screen and  (max-width: 43em) {  
+    .pagecontainer{
+        max-width: 100%;
+    }
+}
+
+@media only screen and  (min-width: 43em) {  
+    .pagecontainer{
+        max-width: 97%;
+    }
+}
+
+
+.progress{
+    width: 100%;
+    border-radius: 8px;
+    border: 2px solid gray;
+}
+
+.progress{
+    height: 2rem; 
+}
+
+
+.col-resistenza{
+    text-align: left;
+}
+
+#batterypercentage{
+    font-weight: bold;
+}
+
+.arrow {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+#production-chart{
+    max-height: 30em;
+    min-height: 30em;
+}
+
+.compare_btn{
+    margin: 0.5em;
+}
+
+@media only screen and  (min-width: 57em) {  
+    .compare {
+        border-left: 1px solid gray;
+    }
+}
+
+.produced_label{
+    margin-top: 2px;
+}
