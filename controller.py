@@ -445,7 +445,7 @@ def buderusEnergyConsumedMonthly():
 
 @app.route('/buderus/saveEnergyConsumedMonthly', methods = ['GET', 'POST'])
 def buderusSaveEnergyConsumedMonthly():
-    if session.get("authenticated") or request.args.get("salt", None, None) == BUDERUS_DOWNLOAD_SECRET :
+    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret'] :
 
         if request.method == 'GET':
             
@@ -538,7 +538,7 @@ def buderusgetGeneralData():
 
 @app.route('/buderus/getTotalProducedEnergy', methods = ['GET', 'POST'])
 def buderusGetTotalProducedEnergy():
-    if session.get("authenticated") or request.args.get("salt", None, None) == BUDERUS_DOWNLOAD_SECRET :
+    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret'] :
 
         if request.method == 'GET':
             
@@ -553,3 +553,22 @@ def buderusGetTotalProducedEnergy():
     else: # need to authenticate
         return render_template("login.html")
 
+'''
+@app.route('/buderus/test', methods = ['GET', 'POST'])
+def buderusTesting():
+    if session.get("authenticated") :
+
+        if request.method == 'GET':
+            
+            path = request.args.get("path", None, None)
+            buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
+            recordings = buderusDataManager.buderusRequest(path)
+
+            return jsonify(recordings)
+        else:
+            return "Method not supported"
+
+    else: # need to authenticate
+        return render_template("login.html")
+
+'''
