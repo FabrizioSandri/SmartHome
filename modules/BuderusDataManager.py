@@ -218,15 +218,6 @@ class BuderusDataManager:
 
         return (fileLocation)
 
-    '''
-    ritorna l'energia prodotta dalla pompa di calore per il calcolo del rendimento
-    '''
-    def getTotalProducedEnergy(self):
-        requestUrl = "/heatSources/cumulatedHeatEnergySecondBurner"
-
-        producedEnergy = self.buderusRequest(requestUrl)["value"]
-
-        return producedEnergy
 
     '''
     ottiene dati generali sull'impianto

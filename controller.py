@@ -536,22 +536,6 @@ def buderusgetGeneralData():
         return render_template("login.html", vars=envData["vars"])
 
 
-@app.route('/buderus/getTotalProducedEnergy', methods = ['GET', 'POST'])
-def buderusGetTotalProducedEnergy():
-    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret'] :
-
-        if request.method == 'GET':
-            
-            buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-            data = buderusDataManager.getTotalProducedEnergy()
-
-            return str(data)
-
-        else:
-            return "Method not supported"
-
-    else: # need to authenticate
-        return render_template("login.html")
 
 '''
 @app.route('/buderus/test', methods = ['GET', 'POST'])
