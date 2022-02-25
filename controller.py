@@ -4,6 +4,7 @@ from flask import send_file
 from flask import request
 from flask import jsonify
 from flask import session
+from flask import Response
 
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
@@ -13,7 +14,7 @@ from Utilities import Utilities
 import time
 import json
 import os
-
+import cv2 as cv
 
 '''
 Env variables
@@ -556,3 +557,51 @@ def buderusTesting():
         return render_template("login.html")
 
 '''
+
+
+#################### SURVEILLANCE ####################
+
+def gen_frames(videoCaptureSource):  
+    while True:
+        success, frame = videoCaptureSource.read()  # read the videoCaptureSource frame
+        if not success:
+            break
+        else:
+            ret, buffer = cv.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
+
+
+@app.route('/surveillance')
+def surveillance():
+    if session.get("authenticated") :
+
+        if request.method == 'GET':
+            return render_template('surveillance.html', vars=envData["vars"])
+        else:
+            return "Method not supported"
+
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
+    
+
+@app.route('/surveillance/video_feed')
+def video_feed():
+    if session.get("authenticated") :
+
+        if request.method == 'GET':
+            cameraid = request.args.get("cameraid", None, None)
+            cameraData = envData["surveillance"][cameraid]
+            
+            rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
+            camera = cv.VideoCapture(rtspStream)
+
+
+            return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        else:
+            return "Method not supported"
+        
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
