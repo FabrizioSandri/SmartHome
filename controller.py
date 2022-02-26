@@ -9,6 +9,7 @@ from flask import Response
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
 from modules.BuderusDataManager import BuderusDataManager
+from modules.Camera import Camera
 from Utilities import Utilities
 
 import time
@@ -563,7 +564,7 @@ def buderusTesting():
 
 def gen_frames(videoCaptureSource):  
     while True:
-        success, frame = videoCaptureSource.read()  # read the videoCaptureSource frame
+        success, frame = videoCaptureSource.getFrame()  # read the videoCaptureSource frame
         if not success:
             break
         else:
@@ -578,7 +579,8 @@ def surveillance():
     if session.get("authenticated") :
 
         if request.method == 'GET':
-            return render_template('surveillance.html', vars=envData["vars"])
+
+            return render_template('surveillance.html', vars=envData["vars"], cameras=json.dumps(list(envData["surveillance"].keys())))
         else:
             return "Method not supported"
 
@@ -595,8 +597,7 @@ def video_feed():
             cameraData = envData["surveillance"][cameraid]
             
             rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
-            camera = cv.VideoCapture(rtspStream)
-
+            camera = Camera(rtspStream)
 
             return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
