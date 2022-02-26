@@ -46,12 +46,16 @@
         <div class="container-fluid">
             
             <div class="row justify-content-center">
-                <h3 class="spacing-right">Seleziona una webcam</h3>
-                <select id="cameras"></select>
-                <button class="btn btn-secondary" onclick="switchCamera()">Seleziona</button>
+                <div class="col text-center">
+                    <h3 class="spacing-right">Seleziona una webcam</h3>
+                </div>
+                <div class="col text-center">
+                    <select id="cameras"></select>
+                    <button class="btn btn-secondary" onclick="switchCamera()">Seleziona</button>
+                </div>
             </div>
             <div class="row justify-content-center">
-                <img id="cameraView" src="" width="80%">
+                <img id="cameraView" src="" alt="" width="80%">
             </div>
 
         </div>

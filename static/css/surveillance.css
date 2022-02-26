@@ -1,0 +1,23 @@
+.spacing-right{
+    margin-right: 1em;
+}
+
+#cameraView {
+    border: 1px solid rgb(46, 46, 46);
+}
+
+@media only screen and  (max-width: 43em) {  
+    #cameraView{
+        width: 100%;
+    }
+}
+
+@media only screen and  (min-width: 43em) {  
+    #cameraView{
+        width: 80%;
+    }
+}
+
+.text-center {
+    text-align: center;
+}
