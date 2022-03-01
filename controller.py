@@ -152,7 +152,7 @@ def download_monthly_historical_file():
                 # se il file del 1 del mese esiste allora ok
                 if os.path.isfile(fileLocationFirstOfMonth):
 
-                    monthDatasetLocation = WeatherDataManager.getMonthFitleredHisoricalFile(envData["weather"]["historical_data_location"], year, month, precision)
+                    monthDatasetLocation = WeatherDataManager.getMonthFitleredHisoricalFile(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], year, month, precision)
                     if monthDatasetLocation != 0:
                         return send_file(monthDatasetLocation)
                     else:
