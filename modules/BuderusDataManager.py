@@ -191,7 +191,7 @@ class BuderusDataManager:
 
         month = parsedDate.strftime("%m")
         year = parsedDate.strftime("%Y")
-        fileLocation = os.path.join(self.self.historical_data_location, f"{year}{month}_buderus.csv")
+        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
 
         monthlyConsumedEnergy = json.loads(self.getMonthlyConsumedEnergy(date))
         dataframe = pd.DataFrame(monthlyConsumedEnergy)
@@ -213,20 +213,11 @@ class BuderusDataManager:
 
         month = parsedDate.strftime("%m")
         year = parsedDate.strftime("%Y")
-        fileLocation = os.path.join(self.self.historical_data_location, f"{year}{month}_buderus.csv")
+        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
 
 
         return (fileLocation)
 
-    '''
-    ritorna l'energia prodotta dalla pompa di calore per il calcolo del rendimento
-    '''
-    def getTotalProducedEnergy(self):
-        requestUrl = "/heatSources/cumulatedHeatEnergySecondBurner"
-
-        producedEnergy = self.buderusRequest(requestUrl)["value"]
-
-        return producedEnergy
 
     '''
     ottiene dati generali sull'impianto

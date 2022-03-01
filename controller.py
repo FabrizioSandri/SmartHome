@@ -4,16 +4,18 @@ from flask import send_file
 from flask import request
 from flask import jsonify
 from flask import session
+from flask import Response
 
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
 from modules.BuderusDataManager import BuderusDataManager
+from modules.Camera import Camera
 from Utilities import Utilities
 
 import time
 import json
 import os
-
+import cv2 as cv
 
 '''
 Env variables
@@ -150,7 +152,7 @@ def download_monthly_historical_file():
                 # se il file del 1 del mese esiste allora ok
                 if os.path.isfile(fileLocationFirstOfMonth):
 
-                    monthDatasetLocation = WeatherDataManager.getMonthFitleredHisoricalFile(envData["weather"]["historical_data_location"], year, month, precision)
+                    monthDatasetLocation = WeatherDataManager.getMonthFitleredHisoricalFile(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], year, month, precision)
                     if monthDatasetLocation != 0:
                         return send_file(monthDatasetLocation)
                     else:
@@ -445,7 +447,7 @@ def buderusEnergyConsumedMonthly():
 
 @app.route('/buderus/saveEnergyConsumedMonthly', methods = ['GET', 'POST'])
 def buderusSaveEnergyConsumedMonthly():
-    if session.get("authenticated") or request.args.get("salt", None, None) == BUDERUS_DOWNLOAD_SECRET :
+    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret'] :
 
         if request.method == 'GET':
             
@@ -536,20 +538,71 @@ def buderusgetGeneralData():
         return render_template("login.html", vars=envData["vars"])
 
 
-@app.route('/buderus/getTotalProducedEnergy', methods = ['GET', 'POST'])
-def buderusGetTotalProducedEnergy():
-    if session.get("authenticated") or request.args.get("salt", None, None) == BUDERUS_DOWNLOAD_SECRET :
+
+'''
+@app.route('/buderus/test', methods = ['GET', 'POST'])
+def buderusTesting():
+    if session.get("authenticated") :
 
         if request.method == 'GET':
             
+            path = request.args.get("path", None, None)
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-            data = buderusDataManager.getTotalProducedEnergy()
+            recordings = buderusDataManager.buderusRequest(path)
 
-            return str(data)
-
+            return jsonify(recordings)
         else:
             return "Method not supported"
 
     else: # need to authenticate
         return render_template("login.html")
 
+'''
+
+
+#################### SURVEILLANCE ####################
+
+def gen_frames(videoCaptureSource):  
+    while True:
+        success, frame = videoCaptureSource.getFrame()  # read the videoCaptureSource frame
+        if not success:
+            break
+        else:
+            ret, buffer = cv.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
+
+
+@app.route('/surveillance')
+def surveillance():
+    if session.get("authenticated") :
+
+        if request.method == 'GET':
+
+            return render_template('surveillance.html', vars=envData["vars"], cameras=json.dumps(list(envData["surveillance"].keys())))
+        else:
+            return "Method not supported"
+
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
+    
+
+@app.route('/surveillance/video_feed')
+def video_feed():
+    if session.get("authenticated") :
+
+        if request.method == 'GET':
+            cameraid = request.args.get("cameraid", None, None)
+            cameraData = envData["surveillance"][cameraid]
+            
+            rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
+            camera = Camera(rtspStream)
+
+            return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        else:
+            return "Method not supported"
+        
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
