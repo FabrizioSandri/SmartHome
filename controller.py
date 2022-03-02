@@ -5,6 +5,7 @@ from flask import request
 from flask import jsonify
 from flask import session
 from flask import Response
+from flask import send_from_directory
 
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
@@ -46,6 +47,10 @@ def index():
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 #################### LOGIN ####################
 @app.route('/login', methods = ['POST'])
