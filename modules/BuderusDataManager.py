@@ -202,7 +202,7 @@ class BuderusDataManager:
     esporta i dati mensili (specificando il mese tramite il parametro date) in formato csv.
     Il metodo ritorna la location del file csv generato
     '''
-    def exportMonthlyConsumedEnergy(self, date):
+    def getMonthlyConsumedEnergyFile(self, date):
 
         # monthlyConsumedEnergy = json.loads(self.getMonthlyConsumedEnergy(date))
         # dataframe = pd.DataFrame(monthlyConsumedEnergy)
@@ -218,6 +218,23 @@ class BuderusDataManager:
 
         return (fileLocation)
 
+    '''
+    ritorna l'energia consumata mensilmente, presa da file e non direttamente dal sistema buderus
+    '''
+    def getMonthlyConsumedEnergyFromFile(self, date):
+        fileLocation = self.getMonthlyConsumedEnergyFile(date)
+
+        dataframe = pd.read_csv(fileLocation)
+
+        days = dataframe.iloc[:,0].values
+        measure = dataframe.iloc[:,1].values
+        
+        consumedEnergy = {
+            "days" : days.tolist(),
+            "measure" : measure.tolist()
+        }
+
+        return json.dumps(consumedEnergy)
 
     '''
     ottiene dati generali sull'impianto
