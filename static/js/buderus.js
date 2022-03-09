@@ -2,7 +2,7 @@ let dailyConsumedEnergyChart;
 let monthlyConsumedEnergyChart;
 let dailyTemperaturesChart;
 
-function getConsumedEnergy() {
+function getConsumedEnergyDaily() {
     date = document.getElementById("day").value;
 
     var xhttp = new XMLHttpRequest();
@@ -74,7 +74,7 @@ function getConsumedEnergy() {
         }
     }
     
-    xhttp.open("GET", "buderus/energyConsumed?date=" + date, true);
+    xhttp.open("GET", "buderus/energyConsumedDaily?date=" + date, true);
     xhttp.send();
 }
 
@@ -167,7 +167,7 @@ function getTemperatures() {
 }
 
 function displayDailyCharts() {
-    getConsumedEnergy();
+    getConsumedEnergyDaily();
     getTemperatures();
 }
 

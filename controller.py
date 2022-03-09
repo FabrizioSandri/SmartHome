@@ -406,8 +406,8 @@ def buderus():
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
 
-@app.route('/buderus/energyConsumed', methods = ['GET', 'POST'])
-def buderusEnergyConsumed():
+@app.route('/buderus/energyConsumedDaily', methods = ['GET', 'POST'])
+def buderusEnergyConsumedDaily():
     if session.get("authenticated") :
 
         if request.method == 'GET':
@@ -441,7 +441,7 @@ def buderusEnergyConsumedMonthly():
 
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
 
-            return str(buderusDataManager.getMonthlyConsumedEnergy(date))
+            return str(buderusDataManager.getMonthlyConsumedEnergyFromFile(date))
 
         else:
             return "Method not supported"
@@ -514,7 +514,7 @@ def buderusDownloadMonthlyPowerConsume():
                 return "Data errata"
 
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-            return send_file(buderusDataManager.exportMonthlyConsumedEnergy(date))
+            return send_file(buderusDataManager.getMonthlyConsumedEnergyFile(date))
 
 
         else:
