@@ -14,26 +14,73 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <script>
-            function generateCameraSelector() {
+            
+            function generateCameraSelector(id) {
                 camerasJson = JSON.parse( {{ cameras | tojson | safe }} )
 
-                selectCamera = document.getElementById("cameras")
+                selectCamera = document.getElementById(`cameras${id}`);
 
                 camerasJson.forEach((camera) => {
                     let optionCamera = document.createElement("option");
                     optionCamera.setAttribute("value", "" + camera);
                     optionCamera.innerText = camera;
-
+                    
                     selectCamera.appendChild(optionCamera);
                 });
+                    
+                
+                
             }
 
-            function switchCamera() {
-                cameraView = document.getElementById("cameraView");
-
-                newCameraid = document.getElementById("cameras").value;
-                console.log(newCameraid)
+            function switchCamera(id) {
+                console.log(`camera${id}`)
+                cameraView = document.getElementById(`camera${id}`);
+                newCameraid = document.getElementById(`cameras${id}`).value;
+                
+                console.log(`/surveillance/video_feed?cameraid=${newCameraid}`)
                 cameraView.setAttribute("src", `/surveillance/video_feed?cameraid=${newCameraid}`)
+            }
+
+            /**
+             * Dynamically generate the camera layout with a total of "numCameras" cameras
+             */
+            function generateCameraLayout(numCameras){
+                let containerDiv = document.getElementById("mainContainer");
+
+
+                for (let id = 0; id < numCameras; id++) {
+                    let row1Div = document.createElement("div");
+                    let row2Div = document.createElement("div");
+
+                    row1Div.classList.add("row", "justify-content-center");
+                    row2Div.classList.add("row", "justify-content-center");
+
+                    let selectCamera = document.createElement("select");
+                    selectCamera.id = `cameras${id}`;
+
+                    let btnView = document.createElement("button");
+                    btnView.innerText = "Seleziona";
+                    btnView.onclick = () => switchCamera(id);
+                    btnView.classList.add("btn", "btn-secondary");
+
+                    let cameraView = document.createElement("img");
+                    cameraView.id = `camera${id}`;
+                    cameraView.src = "";
+                    cameraView.alt = "";
+                    cameraView.classList.add("cameraview");
+                    cameraView.onerror = () => cameraView.src='static/empty.png';
+
+                    containerDiv.appendChild(row1Div);
+                    containerDiv.appendChild(row2Div);
+                    row1Div.appendChild(selectCamera);
+                    row1Div.appendChild(btnView);
+                    row2Div.appendChild(cameraView);
+
+
+                    generateCameraSelector(id);
+                }
+                
+
             }
 
         </script>
@@ -42,26 +89,13 @@
         <!-- Nav Bar -->
         {% include "navBar.html" %}
         
-        <!-- Apps container -->
-        <div class="container-fluid">
-            
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h3 class="spacing-right">Seleziona una webcam</h3>
-                </div>
-                <div class="col-md-4 text-center">
-                    <select id="cameras"></select>
-                    <button class="btn btn-secondary" onclick="switchCamera()">Seleziona</button>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <img id="cameraView" src="" alt="" width="80%" onerror="this.src='static/empty.png';">
-            </div>
-
+        <!-- Main container -->
+        <div class="container-fluid" id="mainContainer">
+      
         </div>
 
         <script>
-            generateCameraSelector();
+            generateCameraLayout(1);
         </script>
 
     </body>
