@@ -1,5 +1,6 @@
 from threading import Thread, Lock
 import cv2 as cv
+import time
 
 class Camera :
     
@@ -7,13 +8,19 @@ class Camera :
         self.camera = cv.VideoCapture(url)
         self.mutex_M = Lock()
         self.mutex_N = Lock()
+        self.exit_flag = time.time()
 
-        t = Thread(target=self.passiveRead)
-        t.daemon = True
-        t.start()
+        self.t = Thread(target=self.passiveRead)
+        self.t.daemon = True
+        self.t.start()
 
     def passiveRead(self):
         while True:
+
+            if time.time() - self.exit_flag > 3: # after 3 seconds of inactivity stop the stream
+                self.camera.release()
+                break
+
             self.mutex_N.acquire() 
             self.mutex_M.acquire() 
             self.mutex_N.release()
@@ -25,6 +32,8 @@ class Camera :
     def getFrame(self):
         found = False
         frame = None
+
+        self.exit_flag = time.time()
 
         self.mutex_N.acquire() 
         self.mutex_M.acquire() 
