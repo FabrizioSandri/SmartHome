@@ -7,7 +7,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
                  
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" crossorigin="anonymous">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/surveillance.css') }}">
 
@@ -44,43 +44,68 @@
             /**
              * Dynamically generate the camera layout with a total of "numCameras" cameras
              */
-            function generateCameraLayout(numCameras){
+            function generateCameraLayout(rows, cols){
                 let containerDiv = document.getElementById("mainContainer");
+                containerDiv.innerHTML = '';
 
+                for (let row = 0; row < rows; row++) {
+                    let rowDiv = document.createElement("div");
+                    rowDiv.classList.add("row", "justify-content-center");
 
-                for (let id = 0; id < numCameras; id++) {
-                    let row1Div = document.createElement("div");
-                    let row2Div = document.createElement("div");
+                    containerDiv.appendChild(rowDiv);
 
-                    row1Div.classList.add("row", "justify-content-center");
-                    row2Div.classList.add("row", "justify-content-center");
+                    for (let col = 0; col < cols; col++) {
+                        let colDiv = document.createElement("div");
+                        colDiv.classList.add("col");
 
-                    let selectCamera = document.createElement("select");
-                    selectCamera.id = `cameras${id}`;
+                        let id = row*cols + col; // the id is given by the number of cells already added
 
-                    let btnView = document.createElement("button");
-                    btnView.innerText = "Seleziona";
-                    btnView.onclick = () => switchCamera(id);
-                    btnView.classList.add("btn", "btn-secondary");
+                        let row1Div = document.createElement("div");
+                        let row2Div = document.createElement("div");
 
-                    let cameraView = document.createElement("img");
-                    cameraView.id = `camera${id}`;
-                    cameraView.src = "";
-                    cameraView.alt = "";
-                    cameraView.classList.add("cameraview");
-                    cameraView.onerror = () => cameraView.src='static/empty.png';
+                        row1Div.classList.add("row", "justify-content-center");
+                        row2Div.classList.add("row", "justify-content-center");
 
-                    containerDiv.appendChild(row1Div);
-                    containerDiv.appendChild(row2Div);
-                    row1Div.appendChild(selectCamera);
-                    row1Div.appendChild(btnView);
-                    row2Div.appendChild(cameraView);
+                        let selectCamera = document.createElement("select");
+                        selectCamera.id = `cameras${id}`;
 
+                        let btnView = document.createElement("button");
+                        btnView.innerText = "Seleziona";
+                        btnView.onclick = () => switchCamera(id);
+                        btnView.classList.add("btn", "btn-secondary");
 
-                    generateCameraSelector(id);
+                        var cameraView = document.createElement("img");
+                        cameraView.id = `camera${id}`;
+                        cameraView.src = "static/empty.png";
+                        cameraView.alt = "";
+                        cameraView.style.width = "100%";
+                        cameraView.classList.add("cameraview");
+                        cameraView.onerror = () => cameraView.src='static/empty.png';
+                        
+                        rowDiv.appendChild(colDiv);
+
+                        // the select button on the second line will be at the bottom
+                        if (row == 1){
+                            colDiv.appendChild(row2Div);
+                            colDiv.appendChild(row1Div);
+                        }else{
+                            colDiv.appendChild(row1Div);
+                            colDiv.appendChild(row2Div);
+                        }
+                        
+                        row1Div.appendChild(selectCamera);
+                        row1Div.appendChild(btnView);
+                        row2Div.appendChild(cameraView);
+
+                        generateCameraSelector(id);
+                    }
+                }
+
+                // if a single camera reduce the size of the box
+                if (rows==1 && cols==1 && window.matchMedia("(min-width: 43em)").matches){
+                    cameraView.style.width = "80%";
                 }
                 
-
             }
 
         </script>
@@ -88,14 +113,25 @@
     <body>
         <!-- Nav Bar -->
         {% include "navBar.html" %}
-        
+
+        <div class="container-fluid">
+            <button type="button" class="btn btn-secondary" onclick="generateCameraLayout(1,1)">
+                1 <span class="fas fa-border-all"></span>
+            </button>
+    
+            <button type="button" class="btn btn-secondary" onclick="generateCameraLayout(2,2)">
+                4 <span class="fas fa-border-all"></span>
+            </button>
+        </div>
+
+
         <!-- Main container -->
         <div class="container-fluid" id="mainContainer">
-      
+
         </div>
 
         <script>
-            generateCameraLayout(1);
+            generateCameraLayout(1,1);
         </script>
 
     </body>

@@ -4,7 +4,6 @@
 
 .cameraview {
     border: 2px solid rgb(46, 46, 46);
-    margin-bottom: 5em;
 }
 
 @media only screen and  (max-width: 43em) {  
