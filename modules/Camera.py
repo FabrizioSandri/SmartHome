@@ -30,11 +30,8 @@ class Camera :
             self.mutex_M.release()
 
     def getFrame(self):
-        found = False
-        frame = None
-
         self.exit_flag = time.time()
-
+        
         self.mutex_N.acquire() 
         self.mutex_M.acquire() 
         self.mutex_N.release()
