@@ -7,61 +7,38 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
                  
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css" crossorigin="anonymous">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/surveillance.css') }}">
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <script>
-            function generateCameraSelector() {
-                camerasJson = JSON.parse( {{ cameras | tojson | safe }} )
+        <script src="{{ url_for('static', filename='js/surveillance.js') }}" ></script>
 
-                selectCamera = document.getElementById("cameras")
-
-                camerasJson.forEach((camera) => {
-                    let optionCamera = document.createElement("option");
-                    optionCamera.setAttribute("value", "" + camera);
-                    optionCamera.innerText = camera;
-
-                    selectCamera.appendChild(optionCamera);
-                });
-            }
-
-            function switchCamera() {
-                cameraView = document.getElementById("cameraView");
-
-                newCameraid = document.getElementById("cameras").value;
-                console.log(newCameraid)
-                cameraView.setAttribute("src", `/surveillance/video_feed?cameraid=${newCameraid}`)
-            }
-
-        </script>
     </head>
     <body>
         <!-- Nav Bar -->
         {% include "navBar.html" %}
-        
-        <!-- Apps container -->
+
         <div class="container-fluid">
-            
-            <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h3 class="spacing-right">Seleziona una webcam</h3>
-                </div>
-                <div class="col-md-4 text-center">
-                    <select id="cameras"></select>
-                    <button class="btn btn-secondary" onclick="switchCamera()">Seleziona</button>
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <img id="cameraView" src="" alt="" width="80%" onerror="this.src='static/empty.png';">
-            </div>
+            <button type="button" class="btn btn-secondary" onclick="generateCameraLayout(1,1,camerasJson)">
+                1 <span class="fas fa-border-all"></span>
+            </button>
+    
+            <button type="button" class="btn btn-secondary" onclick="generateCameraLayout(2,2,camerasJson)">
+                4 <span class="fas fa-border-all"></span>
+            </button>
+        </div>
+
+
+        <!-- Main container -->
+        <div class="container-fluid" id="mainContainer">
 
         </div>
 
         <script>
-            generateCameraSelector();
+            camerasJson = JSON.parse( {{ cameras | tojson | safe }} );
+            generateCameraLayout(1, 1, camerasJson );
         </script>
 
     </body>
