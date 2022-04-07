@@ -573,8 +573,7 @@ def gen_frames(videoCaptureSource):
         if not success:
             break
         else:
-            ret, buffer = cv.imencode('.jpg', frame)
-            frame = buffer.tobytes()
+            frame = frame.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
 
