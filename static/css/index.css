@@ -3,9 +3,6 @@
     padding: 20px;
 }
 
-#title{
-    font-weight: 300;
-}
 
 .card-title {
     font-weight: bold;
@@ -37,4 +34,8 @@
 
 .top_img{
     color: rgb(66, 66, 66);
+}
+
+.btn {
+    width: 100%;
 }
