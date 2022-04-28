@@ -12,13 +12,11 @@ function generateCameraSelector(id, camerasJson) {
     
 }
 
-function switchCamera(id) {
-    console.log(`camera${id}`)
+function switchCamera(id, numCameras) {
     cameraView = document.getElementById(`camera${id}`);
     newCameraid = document.getElementById(`cameras${id}`).value;
     
-    console.log(`/surveillance/video_feed?cameraid=${newCameraid}`)
-    cameraView.setAttribute("src", `/surveillance/video_feed?cameraid=${newCameraid}`)
+    cameraView.setAttribute("src", `/surveillance/video_feed?cameraid=${newCameraid}&numCameras=${numCameras}`)
 }
 
 /**
@@ -51,7 +49,7 @@ function generateCameraLayout(rows, cols, camerasJson){
 
             let btnView = document.createElement("button");
             btnView.innerText = "Seleziona";
-            btnView.onclick = () => switchCamera(id);
+            btnView.onclick = () => switchCamera(id, rows*cols);
             btnView.classList.add("btn", "btn-secondary");
 
             var cameraView = document.createElement("img");

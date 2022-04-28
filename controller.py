@@ -21,7 +21,7 @@ import cv2 as cv
 '''
 Env variables
 '''
-envFile = open("./ENV.json", "r")
+envFile = open("./ENV.json", "r", encoding='utf-8')
 envData = json.load(envFile)
 envFile.close()
 
@@ -573,8 +573,7 @@ def gen_frames(videoCaptureSource):
         if not success:
             break
         else:
-            ret, buffer = cv.imencode('.jpg', frame)
-            frame = buffer.tobytes()
+            frame = frame.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
 
@@ -599,10 +598,12 @@ def video_feed():
 
         if request.method == 'GET':
             cameraid = request.args.get("cameraid", None, None)
+            numCameras = request.args.get("numCameras", None, None) # in order to resize the image
+
             cameraData = envData["surveillance"][cameraid]
             
             rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
-            camera = Camera(rtspStream)
+            camera = Camera(rtspStream, numCameras)
 
             return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
