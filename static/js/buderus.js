@@ -18,22 +18,24 @@ function getConsumedEnergyDaily() {
             }
             document.getElementById("totalDailyConsumed").innerText = `Consumo totale: ${totalDailyConsumed} kWh`
 
-            // se il grafico esisteva gia lo distruggo e poi ricreo
+            // if the chart already exists destroy it and regenerate a new one
             if (dailyConsumedEnergyChart) { 
                 dailyConsumedEnergyChart.destroy();
             }
             
             dailyConsumedEnergyChart = new Chart("energyConsumed-chart", {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: consumedEnergy.hours,
                     datasets: [
                         { 
                             data: consumedEnergy.measure,
                             label: "Consumo energetico",
-                            fill: true,
-                            borderColor: "#2c3e50",
-                            backgroundColor: "rgba(44, 62, 80, 0.4)"
+                            borderColor: "black",
+                            backgroundColor: "rgba(44, 62, 80, 0.4)",
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }
                     ]
                 },
@@ -41,33 +43,38 @@ function getConsumedEnergyDaily() {
                     maintainAspectRatio: false,
                     responsive: true,
                     scales: {
-                        xAxes: [{
-                            scaleLabel: {
+                        x: {
+                            display: true,
+                            title: {
                                 display: true,
-                                labelString: 'Orario'
+                                text: 'Orario'
                             }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
+                        },
+                        y: {
+                            display: true,
+                            title: {
                                 display: true,
-                                labelString: 'Consumo - kW/h'
+                                text: 'Consumo - kW/h'
                             },
                             ticks: {
                                 beginAtZero: true,
                                 max: Math.max.apply(null, consumedEnergy.measure) + 0.5
                             }
-                        }]
+                        }
                     },
-                    tooltips: {
-                        callbacks: {
-                            title: function(tooltipItem){
-                                return "Orario: " + this._data.labels[tooltipItem[0].index];
-                            },
-                            label: (tooltipItems, data) => {
-                                return "Consumo: " + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index] + ' kW';
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(TooltipItems){
+                                    return "Orario: " + TooltipItems[0].label ;
+                                },
+                                label: (TooltipItem) => {
+                                    return "Consumo: " + TooltipItem.formattedValue + ' kW';
+                                }
                             }
                         }
-                    } 
+                    }
+                    
                 }
             });
             
@@ -78,6 +85,22 @@ function getConsumedEnergyDaily() {
     xhttp.send();
 }
 
+function trimTemperaturesNonZero(temperatures){
+
+    var i = temperatures.boilerTemperatures.length - 1;
+    while (i >= 0 && temperatures.boilerTemperatures[i] == 0) {
+        i--;
+    }
+
+    temperatures.boilerTemperatures = temperatures.boilerTemperatures.slice(0,i+1);
+    temperatures.hours = temperatures.hours.slice(0,i+1);
+    for (var t=0; t<temperatures.heatingCircuits.length; t++){
+        temperatures.heatingCircuits[t] = temperatures.heatingCircuits[t].slice(0,i+1);
+    }
+
+    return temperatures;
+}
+
 function getTemperatures() {
     date = document.getElementById("day").value;
 
@@ -85,9 +108,9 @@ function getTemperatures() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
 
-            temperatures = JSON.parse(this.responseText);
-            
-            // se il grafico esisteva gia lo distruggo e poi ricreo
+            temperatures = trimTemperaturesNonZero(JSON.parse(this.responseText));
+
+            // if the chart already exists destroy it and regenerate a new one
             if (dailyTemperaturesChart) { 
                 dailyTemperaturesChart.destroy();
             }
@@ -101,31 +124,47 @@ function getTemperatures() {
                             data: temperatures["heatingCircuits"][0],
                             label: "HC1",
                             borderColor: "#0e9aa7",
-                            fill: true
+                            fill: false,
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            hidden: true
                         },
                         { 
                             data: temperatures["heatingCircuits"][1],
-                            label: "piano 1",
-                            borderColor: "#b85042",
-                            fill: true
+                            label: "Piano 1",
+                            borderColor: "#f3622d",
+                            fill: false,
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         },
                         { 
                             data: temperatures["heatingCircuits"][2],
-                            label: "piano 2",
-                            borderColor: "#adcbe3",
-                            fill: true
+                            label: "Piano 2",
+                            borderColor: "#fbab25",
+                            fill: false,
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         },
                         { 
                             data: temperatures["heatingCircuits"][3],
-                            label: "piano 3",
-                            borderColor: "#5e6aa7",
-                            fill: true
+                            label: "Piano 3",
+                            borderColor: "#57b757",
+                            fill: false,
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         },
                         { 
                             data: temperatures["boilerTemperatures"],
                             label: "Acqua sanitaria ",
                             borderColor: "#1e3aa7",
-                            fill: true
+                            fill: false,
+                            borderWidth: 2.5,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }
                     ]
                 },
@@ -133,26 +172,30 @@ function getTemperatures() {
                     maintainAspectRatio: false,
                     responsive: true,
                     scales: {
-                        xAxes: [{
-                            scaleLabel: {
+                        x: {
+                            display: true,
+                            title: {
                                 display: true,
-                                labelString: 'Orario'
+                                text: 'Orario'
                             }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
+                        },
+                        y: {
+                            display: true,
+                            title: {
                                 display: true,
-                                labelString: 'Temperatura - °C'
+                                text: 'Temperatura - °C'
                             }
-                        }]
+                        }
                     },
-                    tooltips: {
-                        callbacks: {
-                            title: function(tooltipItem){
-                                return "Orario: " + this._data.labels[tooltipItem[0].index];
-                            },
-                            label: (tooltipItems, data) => {
-                                return "Temperatura: " + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index] + ' °C';
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(TooltipItems){
+                                    return `Ore ${TooltipItems[0].label} - ${TooltipItems[0].dataset.label}`;
+                                },
+                                label: (TooltipItem) => {
+                                    return "Temperatura: " + TooltipItem.formattedValue + ' °C';
+                                }
                             }
                         }
                     }
@@ -226,22 +269,30 @@ function getConsumedEnergyMonthly() {
             }
             document.getElementById("totalMonthlyConsumed").innerText = `Consumo totale: ${totalMonthlyConsumed} kWh`
             
-            // se il grafico esisteva gia lo distruggo e poi ricreo
+            // average consumed energy
+            monthlyAverage = 0;
+            consumedEnergy.measure.forEach(function (num) { monthlyAverage += num });
+            monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
+            
+
+            // if the chart already exists destroy it and regenerate a new one
             if (monthlyConsumedEnergyChart) { 
                 monthlyConsumedEnergyChart.destroy();
             }
             
             monthlyConsumedEnergyChart = new Chart("energyConsumedMonthly-chart", {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: consumedEnergy.days,
                     datasets: [
                         { 
                             data: consumedEnergy.measure,
                             label: "Consumo energetico",
-                            fill: true,
-                            borderColor: "#2c3e50",
-                            backgroundColor: "rgba(44, 62, 80, 0.4)"
+                            borderColor: "black",
+                            backgroundColor: "rgba(44, 62, 80, 0.4)",
+                            borderWidth: 2.2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
                         }
                     ]
                 },
@@ -249,26 +300,47 @@ function getConsumedEnergyMonthly() {
                     maintainAspectRatio: false,
                     responsive: true,
                     scales: {
-                        xAxes: [{
-                            scaleLabel: {
+                        x: {
+                            title: {
                                 display: true,
-                                labelString: 'Giorno'
+                                text: 'Giorno'
                             }
-                        }],
-                        yAxes: [{
-                            scaleLabel: {
+                        },
+                        y: {
+                            title: {
                                 display: true,
-                                labelString: 'Consumo energetico- kW/h'
+                                text: 'Consumo energetico- kW/h'
                             }
-                        }]
+                        }
                     },
-                    tooltips: {
-                        callbacks: {
-                            title: function(tooltipItem){
-                                return "Giorno del mese: " + this._data.labels[tooltipItem[0].index];
-                            },
-                            label: (tooltipItems, data) => {
-                                return "Consumo: " + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index] + ' kW';
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                title: function(TooltipItems){
+                                    return "Giorno: " + TooltipItems[0].label;
+                                },
+                                label: (TooltipItem) => {
+                                    return "Consumo: " + TooltipItem.formattedValue + ' kW';
+                                }
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                mean: {
+                                    type: 'line',
+                                    yMin: monthlyAverage,
+                                    yMax: monthlyAverage,
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    borderWidth: 2,
+                                    label: {
+                                        enabled: true,
+                                        content: "Media",
+                                        backgroundColor: "transparent",
+                                        color: 'rgb(255, 99, 132)',
+                                        position: "start",
+                                        backgroundColor: "rgba(255,255,255,1)"
+                                    }
+                                }
                             }
                         }
                     }
