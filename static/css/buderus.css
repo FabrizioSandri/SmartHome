@@ -4,3 +4,16 @@ canvas{
     min-height: 28em;
     max-width: 100%;
 }
+
+
+@media only screen and  (max-width: 43em) {  
+    .chart-card-body {
+        padding: 0%;
+    }
+}
+
+@media only screen and  (min-width: 43em) {  
+    .chart-card-body {
+        padding: 1.25rem;
+    }
+}

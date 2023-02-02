@@ -106,7 +106,7 @@ class BuderusDataManager:
         requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
 
         recordings = self.buderusRequest(requestUrl)["recording"]
-        
+        print(recordings)
         days = []
         measure = []
         for day in range(0, len(recordings)): # Nota: day parte da 0
@@ -197,17 +197,14 @@ class BuderusDataManager:
         dataframe = pd.DataFrame(monthlyConsumedEnergy)
         dataframe = dataframe.rename(columns={'days': 'giorno', 'measure': 'Energia consumata (Kw/h)'})
         dataframe.to_csv(fileLocation, index=False)
+        
+        return(monthlyConsumedEnergy)
 
     '''
     esporta i dati mensili (specificando il mese tramite il parametro date) in formato csv.
     Il metodo ritorna la location del file csv generato
     '''
     def getMonthlyConsumedEnergyFile(self, date):
-
-        # monthlyConsumedEnergy = json.loads(self.getMonthlyConsumedEnergy(date))
-        # dataframe = pd.DataFrame(monthlyConsumedEnergy)
-        # dataframe = dataframe.rename(columns={'days': 'giorno', 'measure': 'Energia consumata (Kw/h)'})
-        # dataframe.to_csv("/tmp/buderus.csv", index=False)
 
         parsedDate = datetime.strptime(date, "%Y-%m")
 

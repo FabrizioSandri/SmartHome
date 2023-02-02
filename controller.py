@@ -462,9 +462,7 @@ def buderusSaveEnergyConsumedMonthly():
                 return "Data errata"
 
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-            buderusDataManager.saveMonthlyConsumedEnergy(date)
-
-            return "OK"
+            return buderusDataManager.saveMonthlyConsumedEnergy(date)
 
         else:
             return "Method not supported"
