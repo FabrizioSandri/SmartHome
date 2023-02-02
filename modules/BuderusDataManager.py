@@ -77,7 +77,6 @@ class BuderusDataManager:
         requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
 
         recordings = self.buderusRequest(requestUrl)["recording"]
-        
         hours = []
         measure = []
         for hour in range(0, 24):
@@ -106,7 +105,6 @@ class BuderusDataManager:
         requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
 
         recordings = self.buderusRequest(requestUrl)["recording"]
-        print(recordings)
         days = []
         measure = []
         for day in range(0, len(recordings)): # Nota: day parte da 0
