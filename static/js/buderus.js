@@ -116,7 +116,7 @@ function getTemperatures() {
             }
 
             dailyTemperaturesChart = new Chart("temp-chart", {
-                type: 'line',
+                type: 'custom_line',
                 data: {
                     labels: temperatures.hours,
                     datasets: [
@@ -169,6 +169,9 @@ function getTemperatures() {
                     ]
                 },
                 options: {
+                    interaction: {
+                        mode: 'x'
+                    },
                     maintainAspectRatio: false,
                     responsive: true,
                     scales: {
@@ -189,12 +192,13 @@ function getTemperatures() {
                     },
                     plugins: {
                         tooltip: {
+                            intersect: false,
                             callbacks: {
                                 title: function(TooltipItems){
-                                    return `Ore ${TooltipItems[0].label} - ${TooltipItems[0].dataset.label}`;
+                                    return `Ore ${TooltipItems[0].label} `;
                                 },
                                 label: (TooltipItem) => {
-                                    return "Temperatura: " + TooltipItem.formattedValue + ' °C';
+                                    return TooltipItem.dataset.label + ": " + TooltipItem.formattedValue + ' °C';
                                 }
                             }
                         }

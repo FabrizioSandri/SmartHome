@@ -29,7 +29,7 @@ class WeatherDataManager:
     '''
     def getDailyLabels(self, precision):
         
-        X = self.dataset.loc[:,"# dateTime"]
+        X = self.dataset.loc[:,"dateTime"]
         X = X.iloc[::precision] # select 1 every GAP rows
         XLabels = X.map(lambda x: datetime.fromtimestamp(x).strftime("%H:%M:%S"))
 
@@ -157,9 +157,9 @@ class WeatherDataManager:
 
                 temp_dataset = temp_dataset.iloc[::gap]
 
-                temp_dataset['# dateTime'] = pd.to_datetime(temp_dataset['# dateTime'], unit='s')
-                temp_dataset['# dateTime'] = temp_dataset['# dateTime'].dt.tz_localize('UTC').dt.tz_convert('Europe/Rome')
-                temp_dataset['# dateTime'] = temp_dataset['# dateTime'].dt.strftime('%d-%m-%Y %H:%M:%S')
+                temp_dataset['dateTime'] = pd.to_datetime(temp_dataset['dateTime'], unit='s')
+                temp_dataset['dateTime'] = temp_dataset['dateTime'].dt.tz_localize('UTC').dt.tz_convert('Europe/Rome')
+                temp_dataset['dateTime'] = temp_dataset['dateTime'].dt.strftime('%d-%m-%Y %H:%M:%S')
                 
                 monthDatasets.append(temp_dataset)
 
@@ -193,44 +193,15 @@ class WeatherDataManager:
         today_data.close()
 
         # get first & last line
-        firstLine = lines[0].split(',')
-        lastLine = lines[len(lines) - 1].split(',')
+        firstLine = lines[0].strip().split(',')
+        lastLine = lines[len(lines) - 1].strip().split(',')
+        lastLine = [None if i == "None" else i for i in lastLine]
 
-        ficon_pos = firstLine.index("forecastIcon")
-        frule_pos = firstLine.index("forecastRule")
-        outtemp_pos = firstLine.index("outTemp")
-        intemp_pos = firstLine.index("inTemp")
-        windspeed_pos = firstLine.index("windSpeed")
-        pressure_pos = firstLine.index("barometer")
-        inhumidity_pos = firstLine.index("inHumidity")
-        outhumidity_pos = firstLine.index("outHumidity")
-        sunrise_pos = firstLine.index("sunrise")
-        sunset_pos = firstLine.index("sunset")
+        data = {firstLine[i]: lastLine[i] for i in range(len(firstLine))}
 
-        forecastIcon = lastLine[ficon_pos]
-        forecastRule = lastLine[frule_pos]
-        outTemp = lastLine[outtemp_pos]
-        inTemp = lastLine[intemp_pos]
-        windSpeed = lastLine[windspeed_pos]
-        pressure = lastLine[pressure_pos]
-        inHumidity = lastLine[inhumidity_pos]
-        outHumidity = lastLine[outhumidity_pos]
-        sunrise = datetime.fromtimestamp(int(lastLine[sunrise_pos])).strftime('%H:%M')
-        sunset = datetime.fromtimestamp(int(lastLine[sunset_pos])).strftime('%H:%M')
-
-
-        # return
-        data = {
-            "forecastIcon": forecast["forecastIcon"][forecastIcon],
-            "forecastRule": forecast["forecastRule"][forecastRule],
-            "outTemp": outTemp,
-            "inTemp": inTemp,
-            "windSpeed": windSpeed,
-            "pressure": pressure,
-            "inHumidity": inHumidity,
-            "outHumidity": outHumidity,
-            "sunrise": sunrise,
-            "sunset": sunset
-        }
+        data["sunrise"] = datetime.fromtimestamp(int(data["sunrise"])).strftime('%H:%M')
+        data["sunset"] = datetime.fromtimestamp(int(data["sunset"])).strftime('%H:%M')
+        data["forecastIcon"] = forecast["forecastIcon"][data["forecastIcon"]],
+        data["forecastRule"] = forecast["forecastRule"][data["forecastRule"]],
 
         return json.dumps(data)

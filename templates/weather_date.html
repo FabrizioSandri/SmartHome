@@ -10,37 +10,10 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
 
+        <script src="{{ url_for('static', filename='js/gauge.min.js') }}" ></script>
+        
         <script>
-            function generateDownloadHistoryOptions(){
-                var optionMese = document.getElementById("mese");
-                var optionAnno = document.getElementById("anno");
-
-                var currentYear = new Date().getFullYear();
-                var startYear = 2021; // dati dal 2021 in poi
-
-                var years = [];
-                var months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-                while (startYear <= currentYear){
-                    years.push(startYear++);
-                }
-
-                years.forEach((year) => {
-                    let optionYear = document.createElement("option");
-                    optionYear.setAttribute("value", "" + year);
-                    optionYear.innerText = year;
-
-                    optionAnno.appendChild(optionYear);
-                });
-
-                months.forEach((month) => {
-                    let optionMonth = document.createElement("option");
-                    optionMonth.setAttribute("value", "" + month);
-                    optionMonth.innerText = month;
-
-                    optionMese.appendChild(optionMonth);
-                });
-            }
+            
 
             // get forecast for today
             function getForecast() {
@@ -50,17 +23,31 @@
                     if (this.readyState == 4 && this.status == 200){
                         
                         let result = JSON.parse(this.responseText);
-
+                        console.log(result)
                         let forecast_icon = result["forecastIcon"];
                         let forecast_rule = result["forecastRule"];
-                        let outTemp = parseFloat(result["outTemp"]).toFixed(2);
-                        let inTemp = parseFloat(result["inTemp"]).toFixed(2);
+                        let outTemp = parseFloat(result["outTemp"]).toFixed(1);
+                        let appTemp = parseFloat(result["appTemp"]).toFixed(1);
+                        let dewpoint = parseFloat(result["dewpoint"]).toFixed(1);
+                        let inTemp = parseFloat(result["inTemp"]).toFixed(1);
+                        let windDir = parseInt(result["windDir"]);
                         let windSpeed = parseFloat(result["windSpeed"]).toFixed(2);
+                        let windGust = parseFloat(result["windGust"]).toFixed(2);
+                        let windSpeed10 = parseFloat(result["windSpeed10"]).toFixed(2);
+                        let windchill = parseFloat(result["windchill"]).toFixed(1);
+                        let barometer = parseFloat(result["barometer"]).toFixed(2);
+                        let altimeter = parseFloat(result["altimeter"]).toFixed(2);
                         let pressure = parseFloat(result["pressure"]).toFixed(2);
-                        let outHumidity = parseFloat(result["outHumidity"]).toFixed(2);
+                        let outHumidity = parseInt(result["outHumidity"]);
+                        let heatIndex = parseFloat(result["heatindex"]).toFixed(1);
+                        let humIdex = parseFloat(result["humidex"]).toFixed(1);
+                        let cloudbase = parseInt(result["cloudbase"]);
                         let sunrise = result["sunrise"];
                         let sunset = result["sunset"];
-                        
+                        let dayRain = parseFloat(result["dayRain"]).toFixed(1);
+                        let monthRain = parseFloat(result["monthRain"]).toFixed(1);
+                        let yearRain = parseFloat(result["yearRain"]).toFixed(1);
+
                         document.getElementById("forecasticon").classList = `fas fa-3x fa-${forecast_icon[0]}`;
                         if (forecast_icon.length >= 2){  // snow
                             document.getElementById("snow").style.visibility = "visible";;
@@ -69,13 +56,32 @@
                         }
                         
                         document.getElementById("forecastrule").innerText = forecast_rule;
-                        document.getElementById("outTemp").innerText = outTemp + " °C";
-                        document.getElementById("inTemp").innerText = inTemp + " °C";
-                        document.getElementById("windSpeed").innerText = windSpeed + " km/h";
-                        document.getElementById("pressure").innerText = pressure + " hPa";
-                        document.getElementById("outHumidity").innerText = outHumidity + " %";
+                        document.getElementById("outTemp").setAttribute("data-value", outTemp);
+                        document.getElementById("appTemp").innerText = appTemp;
+                        document.getElementById("dewpoint").innerText = dewpoint;
+                        document.getElementById("windSpeed").setAttribute("data-value", windSpeed);
+                        document.getElementById("windGust").innerText = windGust;
+                        document.getElementById("windSpeed10").innerText = windSpeed10;
+                        document.getElementById("windchill").innerText = windchill;
+                        if (windDir){
+                            document.getElementById("windDir").setAttribute("data-needle", true);
+                            document.getElementById("windDir").setAttribute("data-value", windDir);
+                        }else{
+                            document.getElementById("windDir").setAttribute("data-needle", false);
+                        }
+                        document.getElementById("barometer").setAttribute("data-value", barometer);
+                        document.getElementById("altimeter").innerText = altimeter;
+                        document.getElementById("pressure").innerText = pressure;
+                        document.getElementById("outHumidity").setAttribute("data-value", outHumidity);
+                        document.getElementById("heatIndex").innerText = heatIndex;
+                        document.getElementById("humIdex").innerText = humIdex;
                         document.getElementById("sunrise").innerText = sunrise;
                         document.getElementById("sunset").innerText = sunset;
+                        document.getElementById("cloudbase").setAttribute("data-value", cloudbase);
+                        document.getElementById("dayRain").setAttribute("data-value", dayRain);                        
+                        document.getElementById("monthRain").setAttribute("data-value", monthRain);                        
+                        document.getElementById("yearRain").setAttribute("data-value", yearRain);                        
+
                     }
                 }
 
@@ -87,21 +93,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <style>
-            .card{
+            
+            .linear {
+                padding-left: 1px; 
+                padding-right: 1px;
+            }
+
+            .maincontainer{
                 padding: 1.5em .5em .5em;
                 border-radius: 2em;
                 text-align: center;
                 box-shadow: 0 5px 10px rgba(0,0,0,.2);
-                width: 42rem;
                 margin-bottom: 10px;
             }
-            
-            .second-row{
-                border-top: 1px solid gray;
-                padding-top: 1em;
-                margin-top: 1em;
-            }
 
+            .forminput {
+                width: 15em;
+            }
+            
             #forecasticon, #snow {
                 color: rgb(66, 66, 66);
             } 
@@ -115,11 +124,25 @@
             }
 
             @media only screen and  (min-width: 43em) {  
-                .forecast {
-                    border-left: 1px solid gray;
+                .rightmargin {
+                    border-right: 1px solid rgb(189, 189, 189);
                 }
             }
-
+            
+            #precipitazioni {
+                width: 100%; 
+                text-align: center; 
+                border-bottom: 1px solid #000; 
+                border-left: 1px solid #000; 
+                border-right: 1px solid #000; 
+                line-height: 0.2em;
+                margin: 10px 0 20px; 
+            }
+            
+            #precipitazioni span{
+                background:#fff; 
+                padding:0 10px; 
+            }
         </style>
     
     </head>
@@ -129,148 +152,535 @@
         
         <!-- Page content -->
 
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="card">
-                    <div class="card-body">
-                        <h1 class="card-title">Meteo casa {{ vars["house_name"] }}</h1>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h2 id="outTemp" class="display-3"><strong >- °C</strong></h2>
-                                <p class="text-muted mb-0">Revò, Novella - Trentino</p>
-                            </div>
-                            <div class="forecast col-md-6">
-                                <div class="row justify-content-center" style="margin-bottom: 0.5em;">
-                                    <i id="forecasticon" class="fas fa-cloud-sun fa-3x"></i>
-                                    <i id="snow" class="fas fa-snowflake fa-2x"></i>
-                                </div>
-                                <p id="forecastrule"></p>
-                            </div>
-                        </div>
-
-                        
-                        <div class="row second-row">
-                            <div class="col-md-6">
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Temperatura interna</legend>
-                                    <p id="inTemp">
-                                        <strong>- °C</strong>
-                                    </p>
-                                </fieldset>
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Vento</legend>
-                                    <p id="windSpeed">
-                                        <strong>- km/h</strong>
-                                    </p>
-                                </fieldset>
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Alba</legend>
-                                    <p id="sunrise">
-                                        <strong></strong>
-                                    </p>
-                                </fieldset>
-                            </div>
-                            <div class="col-md-6 forecast">
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Umidità esterna</legend>
-                                    <p id="outHumidity">
-                                        <strong>- %</strong>
-                                    </p>
-                                </fieldset>
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Pressione</legend>
-                                    <p id="pressure">
-                                        <strong>- hPa</strong>
-                                    </p>
-                                </fieldset>
-                                <fieldset class="border p-2">
-                                    <legend  class="h5">Tramonto</legend>
-                                    <p id="sunset">
-                                        <strong></strong>
-                                    </p>
-                                </fieldset>
-                            </div>
-                        </div>
-
-                    </div>
+        <div class="container maincontainer">
+            <div class="row">
+                <div class="col">
+                    <h1>Meteo casa {{ vars["house_name"] }}</h1>
                 </div>
-    
             </div>
-        </div>
+            
+            <div class="row">
+                <div class="col-sm-7">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="outTemp" data-type="radial-gauge"
+                                data-value="-20"
+                                data-title="Temperatura"
+                                data-units="°C"
+                                data-major-ticks="-20,-10,0,10,20,30,40,50"
+                                data-min-value="-20"
+                                data-max-value="50"
+            
+                                data-value-dec="1"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="30"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+
+                                data-font-units-weight="bold"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-color-title="rgba(34, 34, 34, 0.8)"
+                                data-color-units="rgba(34, 34, 34, 0.8)"
+                                data-color-needle="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                
+                                data-highlights='[
+                                    {"from": -20, "to": -10, "color": "rgba(51, 174, 255, 0.8)"},
+                                    {"from": -10, "to": 0, "color": "rgba(51, 174, 255, 0.3)"},
+                                    {"from": 30, "to": 40, "color": "rgba(200, 50, 50, 0.3)"},
+                                    {"from": 40, "to": 50, "color": "rgba(200, 50, 50, 0.8)"}
+                                ]'
+                                data-needle-width="5"
+            
+                                data-width="250"
+                                data-height="250"
+                            ></canvas>
         
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="card text-center">
-                    <h3>Previsioni</h3>
-                    <iframe src="{{ weather['forecast_iframe_address'] }}"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 20em"></iframe>
-                    <div>
-                        <a href="{{ weather['forecast_link_address'] }}" rel="noopener">meteoblue</a>
-                    </div>                
+                            <p>Apparent temperature: <span id="appTemp">-</span> °C</p>
+                            <p>Punto di rugiada: <span id="dewpoint">-</span> °C</p>
+        
+                        </div>
+                        <div class="col">
+                            <canvas id="outHumidity" data-type="radial-gauge"
+                                data-value="0"
+                                data-title="Umidità"
+                                data-units="%"
+            
+                                data-value-dec="0"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="30"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+        
+                                data-font-units-weight="bold"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-color-title="rgba(34, 34, 34, 0.8)"
+                                data-color-units="rgba(34, 34, 34, 0.8)"
+                                data-color-needle="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                
+                                data-min-value="0"
+                                data-max-value="100"
+                                data-width="250"
+                                data-height="250"
+                            ></canvas>
+                            
+                            <p>Heat index: <span id="heatIndex">-</span> °C</p>
+                            <p>Hum index: <span id="humIdex">-</span> °C</p>
+        
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <canvas id="barometer" data-type="radial-gauge"
+                        data-value="1026"
+                        data-title="Barometro"
+                        data-units="hPa"
+                        data-min-value="980"
+                        data-max-value="1040"
+    
+                        data-value-dec="1"
+                        data-value-int="0"
+                        data-value-box-stroke="1"
+                        data-value-text-shadow="0"
+                        data-font-value-size="30"
+                        data-color-value-box-shadow="0"
+                        data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+    
+                        data-font-units-weight="bold"
+                        data-font-title-weight="bolder"
+                        data-font-value-weight="bold"
+                        data-font-numbers-weight="bold"
+                        data-color-title="rgba(34, 34, 34, 0.8)"
+                        data-color-units="rgba(34, 34, 34, 0.8)"
+                        data-color-needle="rgba(255, 50, 50, 0.6)"
+                        data-color-needle-end="rgba(255, 50, 50, 0.6)"
+                        data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                        data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                        data-highlights='[
+                            {"from": 1000, "to": 1020, "color": "#ededed"},
+                            {"from": 1020, "to": 1030, "color": "#cccccc"},
+                            {"from": 1030, "to": 1040, "color": "#999999"}
+                        ]'
+    
+                        data-width="250"
+                        data-height="250"
+                        data-min-value="1000"
+                        data-max-value="1100"
+    
+                        data-start-angle="90"
+                        data-ticks-angle="180"
+                        data-major-ticks="980, 990, 1000, 1010, 1020, 1030, 1040"
+                        data-minor-ticks="5"
+                        data-border-shadow-width="0"
+                        data-borders="false"
+                    ></canvas>
+
+
+                    
+                    <p>Altimeter(QNH): <span id="altimeter">-</span> hPa</p>
+                    <p>Pressure(QFE): <span id="pressure">-</span> hPa</p>
+
+                </div>
+            </div>
+            <div class="row border-top pt-2">
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <canvas id="windSpeed" data-type="radial-gauge"
+                                data-value="0"
+                                data-title="Vento"
+                                data-units="km/h"
+                                data-min-value="0"
+                                data-max-value="100"
+            
+                                data-value-dec="1"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="30"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+        
+                                data-font-units-weight="bold"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-color-title="rgba(34, 34, 34, 0.8)"
+                                data-color-units="rgba(34, 34, 34, 0.8)"
+                                data-color-needle="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                
+                                data-width="250"
+                                data-height="250"
+                            ></canvas>
+        
+                            
+                            <p>Raffiche: <span id="windGust">-</span> km/h</p>
+                            <p>Media 10 min: <span id="windSpeed10">-</span> km/h</p>
+                            
+                        </div>
+                        
+        
+                        <div class="col">
+                            <canvas id="windDir" data-type="radial-gauge"
+                                data-value="0"
+                                data-width="250"
+                                data-height="250"
+                                data-title="Direzione vento"
+                                data-min-value="0"
+                                data-max-value="360"
+                                data-major-ticks="N,NE,E,SE,S,SW,W,NW,N"
+                                data-minor-ticks="22"
+                                data-ticks-angle="360"
+                                data-start-angle="180"
+                                data-highlights="false"
+                                data-value-box="false"
+                                data-color-needle="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.6)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+        
+                                data-font-units-weight="bold"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-color-title="rgba(34, 34, 34, 0.8)"
+                                data-color-units="rgba(34, 34, 34, 0.8)"
+                                data-color-needle="rgba(255, 50, 50, 1)"
+                            ></canvas>
+        
+                            
+                            <p>Wind chill: <span id="windchill">-</span> °C</p>
+        
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="row">
+                        <div class="col linear">
+                            <canvas id="cloudbase" class="linear" data-type="linear-gauge"
+                                data-value="0"
+                                data-title="Nuvole"
+                                data-units="m"
+                                data-width="80"
+                                data-height="300"
+                                data-min-value="0"
+                                data-max-value="5000"
+                                data-major-ticks="0,1000,2000,3000,4000,5000"
+                                data-minor-ticks="6"
+                                data-stroke-ticks="true"
+                                data-color-plate="#fff"
+                                data-border-shadow-width="0"
+                                data-borders="false"
+                                data-bar-begin-circle="false"
+                                data-tick-side="left"
+                                data-number-side="left"
+                                data-needle-side="left"
+                                data-needle-type="line"
+                                data-needle-width="3"
+                                data-color-needle="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+            
+                                data-value-dec="0"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="40"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+                        
+                                data-font-units-weight="bolder"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-font-numbers-size="30"
+                                data-font-title-size="40"
+                                data-font-units-size="40"
+
+                                data-bar-width="5"
+                                data-ticks-width="30"
+                                data-ticks-width-minor="15"
+                            ></canvas>
+                        </div>
+        
+                        <div class="col linear">
+                            <canvas id="dayRain" class="linear" data-type="linear-gauge"
+                                data-value="0"
+                                data-title="Giorno"
+                                data-units="cm"
+                                data-width="80"
+                                data-height="300"
+                                data-min-value="0"
+                                data-max-value="1"
+                                data-major-ticks="0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1"
+                                data-minor-ticks="5"
+                                data-stroke-ticks="true"
+                                data-border-shadow-width="0"
+                                data-borders="false"
+                                data-bar-begin-circle="false"
+                                data-tick-side="left"
+                                data-number-side="left"
+                                data-needle-side="left"
+                                data-needle-type="line"
+                                data-needle-width="3"
+                                data-color-needle="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                data-needle-end="150"
+                                data-color-bar-progress="#327ac0"
+                                
+                                data-value-dec="1"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="40"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+
+                                data-font-units-weight="bolder"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-font-numbers-size="30"
+                                data-font-title-size="40"
+                                data-font-units-size="40"
+
+                                data-bar-width="30"
+                                data-ticks-width="40"
+                                data-ticks-width-minor="15"
+                            ></canvas>
+                        </div>
+
+                        <div class="col linear">
+                            <canvas id="monthRain" class="linear" data-type="linear-gauge"
+                                data-value="0"
+                                data-title="Mese"
+                                data-units="cm"
+                                data-width="80"
+                                data-height="300"
+                                data-min-value="0"
+                                data-max-value="10"
+                                data-major-ticks="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+                                data-minor-ticks="5"
+                                data-stroke-ticks="true"
+                                data-border-shadow-width="0"
+                                data-borders="false"
+                                data-bar-begin-circle="false"
+                                data-tick-side="left"
+                                data-number-side="left"
+                                data-needle-side="left"
+                                data-needle-type="line"
+                                data-needle-width="3"
+                                data-color-needle="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                data-needle-end="150"
+                                data-color-bar-progress="#327ac0"
+                                
+                                data-value-dec="1"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="40"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+        
+                                data-font-units-weight="bolder"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-font-numbers-size="30"
+                                data-font-title-size="40"
+                                data-font-units-size="40"
+
+                                data-bar-width="30"
+                                data-ticks-width="40"
+                                data-ticks-width-minor="15"
+                            ></canvas>
+                        </div>
+
+                        <div class="col linear">
+                            <canvas id="yearRain" class="linear" data-type="linear-gauge"
+                                data-value="0"
+                                data-title="Anno"
+                                data-units="cm"
+                                data-width="80"
+                                data-height="300"
+                                data-min-value="0"
+                                data-max-value="100"
+                                data-major-ticks="0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100"
+                                data-minor-ticks="5"
+                                data-stroke-ticks="true"
+                                data-border-shadow-width="0"
+                                data-borders="false"
+                                data-bar-begin-circle="false"
+                                data-tick-side="left"
+                                data-number-side="left"
+                                data-needle-side="left"
+                                data-needle-type="line"
+                                data-needle-width="3"
+                                data-color-needle="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-end="rgba(255, 50, 50, 0.9)"
+                                data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
+                                data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
+                                data-needle-end="150"
+                                data-color-bar-progress="#327ac0"
+                                
+                                data-highlights='[]'
+                                data-value-dec="1"
+                                data-value-int="0"
+                                data-value-box-stroke="1"
+                                data-value-text-shadow="0"
+                                data-font-value-size="40"
+                                data-color-value-box-shadow="0"
+                                data-color-value-box-background="rgba(226, 226, 226, 0.3)"
+        
+                                data-font-units-weight="bolder"
+                                data-font-title-weight="bolder"
+                                data-font-value-weight="bold"
+                                data-font-numbers-weight="bold"
+                                data-font-numbers-size="30"
+                                data-font-title-size="40"
+                                data-font-units-size="40"
+
+                                data-bar-width="30"
+                                data-ticks-width="40"
+                                data-ticks-width-minor="15"
+                            ></canvas>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-9">
+                            <p id="precipitazioni"><span>Precipitazioni</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row border-top pt-2">
+                <div class="rightmargin col-sm-6">
+                    <h5>Previsioni</h5>
+                    <div class="row justify-content-center">
+                        <i id="forecasticon" class="fas fa-cloud-sun fa-3x"></i>
+                        <i id="snow" class="fas fa-snowflake fa-2x"></i>
+                    </div>
+                    <p id="forecastrule"></p>
+                </div>
+                <div class="col-sm-6">
+                    <h5>Alba e tramonto</h5>
+                    <p>Alba: <span id="sunrise">-</span></p>
+                    <p>Tramonto: <span id="sunset">-</span></p>
                 </div>
             </div>
         </div>
 
-        <div class="container">
-            <hr />
-            <h2>Visualizza dati giornalieri</h2>
-            <p>
-                Selezionare il giorno per cui si vogliono visualizzare i dati. <br />
-                Utilizzare il parametro opzionale precisione per specificare la densità di dati da visualizzare(default: ogni 20 secondi)
-            </p>
+        
+        <div class="container maincontainer">
+            <div class="row">
+                <div class="col-sm-6 ml-3 rightmargin">
+                    <h2>Visualizza dati giornalieri</h2>
+                    <p>
+                        Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 20 secondi)
+                    </p>
 
-            <form method="POST" action="/weather">
+                    <form method="POST" action="/weather">
 
-                <div class="row">
-                    <div class="col-md-2">
-                        <label for="day">Giorno</label>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="date" id="day" name="date" placeholder="Data">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <label for="day">Giorno</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <input type="date" id="day" name="date" class="forminput" placeholder="Data">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <label for="precision">Precisione</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <input type="number" class="forminput" id="precision" name="precision" placeholder="Precisione in secondi">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+                <div class="col-sm-5">
+                    <div class="text-center">
+                        <h3>Previsioni</h3>
+                        <iframe src="{{ weather['forecast_iframe_address'] }}"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 20em"></iframe>
+                        <div>
+                            <a href="{{ weather['forecast_link_address'] }}" rel="noopener">meteoblue</a>
+                        </div>                
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-2">
-                        <label for="precision">Precisione in secondi</label>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="number" id="precision" name="precision" placeholder="precision">
-                    </div>
-                </div>
-
-                <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
-            </form>
-
-            <hr />
-            
-            <h2>Scarica i dati mensili</h2>
-            <p>
-                Selezionare il mese e anno per cui si vogliono scaricare i dati. <br />
-                Specificare la precisione in secondi corrispondente alla densità di dati da scaricare. 
-                <br />
-                ES: Specificare 300 se si vuole che venga ritornato il dataset con una precisione di 5 minuti,
-                ovvero una misurazione ogni 5 minuti.
-                <br /><br />
-                <b>NOTA:</b> ci vorra del tempo per generare il file CSV. (Qualche minuto - attendi)
-            </p>
-
-            <form method="GET" action="/weather/historicalMonth">
                 
-                <select id="mese" name="mese"></select>
-                <select id="anno" name="anno"></select>
-
-                <label for="precisionMonth">Precisione in secondi</label>
-                <input type="number" id="precisionMonth" name="precisionMonth" placeholder="Precisione in secondi">
-                <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
-
-            </form>
-            
+            </div>
         </div>
 
         <script>
             getForecast();
             setInterval(getForecast, 2000);
-            generateDownloadHistoryOptions();
+
+            var screen_width = $(window).width();
+            console.log(screen_width)
+            if (screen_width < 800) {
+                var gauge_size = screen_width * 0.4
+                document.getElementById("outTemp").setAttribute("data-width", gauge_size);
+                document.getElementById("outTemp").setAttribute("data-height", gauge_size);
+                document.getElementById("windSpeed").setAttribute("data-width", gauge_size);
+                document.getElementById("windSpeed").setAttribute("data-height", gauge_size);
+                document.getElementById("windDir").setAttribute("data-width", gauge_size);
+                document.getElementById("windDir").setAttribute("data-height", gauge_size);
+                document.getElementById("barometer").setAttribute("data-width", gauge_size);
+                document.getElementById("barometer").setAttribute("data-height", gauge_size);
+                document.getElementById("outHumidity").setAttribute("data-width", gauge_size);
+                document.getElementById("outHumidity").setAttribute("data-height", gauge_size);
+                // document.getElementById("cloudbase").setAttribute("data-width", gauge_size);
+                // document.getElementById("cloudbase").setAttribute("data-height", gauge_size);
+                // document.getElementById("dayRain").setAttribute("data-width", gauge_size);
+                // document.getElementById("dayRain").setAttribute("data-height", gauge_size);
+                
+            } else {
+                var gauge_size = 250
+
+                document.getElementById("outTemp").setAttribute("data-width", gauge_size);
+                document.getElementById("outTemp").setAttribute("data-height", gauge_size);
+                document.getElementById("windSpeed").setAttribute("data-width", gauge_size);
+                document.getElementById("windSpeed").setAttribute("data-height", gauge_size);
+                document.getElementById("windDir").setAttribute("data-width", gauge_size);
+                document.getElementById("windDir").setAttribute("data-height", gauge_size);
+                document.getElementById("barometer").setAttribute("data-width", gauge_size);
+                document.getElementById("barometer").setAttribute("data-height", gauge_size);
+                document.getElementById("outHumidity").setAttribute("data-width", gauge_size);
+                document.getElementById("outHumidity").setAttribute("data-height", gauge_size);
+            }
         </script>
 
     </body>
