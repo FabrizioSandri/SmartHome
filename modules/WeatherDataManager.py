@@ -201,7 +201,7 @@ class WeatherDataManager:
 
         data["sunrise"] = datetime.fromtimestamp(int(data["sunrise"])).strftime('%H:%M')
         data["sunset"] = datetime.fromtimestamp(int(data["sunset"])).strftime('%H:%M')
-        data["forecastIcon"] = forecast["forecastIcon"][data["forecastIcon"]],
-        data["forecastRule"] = forecast["forecastRule"][data["forecastRule"]],
+        data["forecastIcon"] = forecast["forecastIcon"][data["forecastIcon"]]
+        data["forecastRule"] = forecast["forecastRule"][data["forecastRule"]]
 
         return json.dumps(data)

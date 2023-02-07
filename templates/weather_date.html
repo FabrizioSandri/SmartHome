@@ -23,7 +23,7 @@
                     if (this.readyState == 4 && this.status == 200){
                         
                         let result = JSON.parse(this.responseText);
-                        console.log(result)
+
                         let forecast_icon = result["forecastIcon"];
                         let forecast_rule = result["forecastRule"];
                         let outTemp = parseFloat(result["outTemp"]).toFixed(1);
@@ -48,13 +48,7 @@
                         let monthRain = parseFloat(result["monthRain"]).toFixed(1);
                         let yearRain = parseFloat(result["yearRain"]).toFixed(1);
 
-                        document.getElementById("forecasticon").classList = `fas fa-3x fa-${forecast_icon[0]}`;
-                        if (forecast_icon.length >= 2){  // snow
-                            document.getElementById("snow").style.visibility = "visible";;
-                        }else {
-                            document.getElementById("snow").style.visibility = "hidden";;
-                        }
-                        
+                        document.getElementById("forecasticon").setAttribute("src", "/static/weathericons/" + forecast_icon);
                         document.getElementById("forecastrule").innerText = forecast_rule;
                         document.getElementById("outTemp").setAttribute("data-value", outTemp);
                         document.getElementById("appTemp").innerText = appTemp;
@@ -94,13 +88,17 @@
         
         <style>
             
+            .title {
+                margin-bottom: 0.5em;
+            }
+
             .linear {
                 padding-left: 1px; 
                 padding-right: 1px;
             }
 
             .maincontainer{
-                padding: 1.5em .5em .5em;
+                padding: 0.5em .5em .5em;
                 border-radius: 2em;
                 text-align: center;
                 box-shadow: 0 5px 10px rgba(0,0,0,.2);
@@ -111,9 +109,15 @@
                 width: 15em;
             }
             
-            #forecasticon, #snow {
-                color: rgb(66, 66, 66);
+            #forecasticon {
+                width: 5em;
+                height: 5em;
             } 
+
+            #forecastrule {
+                margin-left: 1em;
+                line-height: 5em;  
+            }
 
             a {
                 color: rgb(66, 66, 66);
@@ -126,6 +130,12 @@
             @media only screen and  (min-width: 43em) {  
                 .rightmargin {
                     border-right: 1px solid rgb(189, 189, 189);
+                }
+            }
+
+            @media only screen and  (max-width: 43em) {  
+                .rightmargin {
+                    border-bottom: 1px solid rgb(189, 189, 189);
                 }
             }
             
@@ -155,7 +165,7 @@
         <div class="container maincontainer">
             <div class="row">
                 <div class="col">
-                    <h1>Meteo casa {{ vars["house_name"] }}</h1>
+                    <h1 class="title">Meteo casa {{ vars["house_name"] }}</h1>
                 </div>
             </div>
             
@@ -245,11 +255,11 @@
                 </div>
                 <div class="col-sm-5">
                     <canvas id="barometer" data-type="radial-gauge"
-                        data-value="1026"
+                        data-value="980"
                         data-title="Barometro"
                         data-units="hPa"
                         data-min-value="980"
-                        data-max-value="1040"
+                        data-max-value="1050"
     
                         data-value-dec="1"
                         data-value-int="0"
@@ -270,9 +280,9 @@
                         data-color-needle-shadow-up="rgba(255, 50, 50, 0)"
                         data-color-needle-shadow-down="rgba(255, 50, 50, 0)"
                         data-highlights='[
-                            {"from": 1000, "to": 1020, "color": "#ededed"},
-                            {"from": 1020, "to": 1030, "color": "#cccccc"},
-                            {"from": 1030, "to": 1040, "color": "#999999"}
+                            {"from": 1010, "to": 1030, "color": "#ededed"},
+                            {"from": 1030, "to": 1040, "color": "#cccccc"},
+                            {"from": 1040, "to": 1050, "color": "#999999"}
                         ]'
     
                         data-width="250"
@@ -282,7 +292,7 @@
     
                         data-start-angle="90"
                         data-ticks-angle="180"
-                        data-major-ticks="980, 990, 1000, 1010, 1020, 1030, 1040"
+                        data-major-ticks="980, 990, 1000, 1010, 1020, 1030, 1040, 1050"
                         data-minor-ticks="5"
                         data-border-shadow-width="0"
                         data-borders="false"
@@ -580,12 +590,12 @@
 
             <div class="row border-top pt-2">
                 <div class="rightmargin col-sm-6">
-                    <h5>Previsioni</h5>
+                    <h5>Previsione</h5>
                     <div class="row justify-content-center">
-                        <i id="forecasticon" class="fas fa-cloud-sun fa-3x"></i>
-                        <i id="snow" class="fas fa-snowflake fa-2x"></i>
+                        <img id="forecasticon" src="/static/weathericons/clear-day.svg" alt="-">
+                        <p id="forecastrule"></p>
                     </div>
-                    <p id="forecastrule"></p>
+                    
                 </div>
                 <div class="col-sm-6">
                     <h5>Alba e tramonto</h5>
@@ -598,8 +608,8 @@
         
         <div class="container maincontainer">
             <div class="row">
-                <div class="col-sm-6 ml-3 rightmargin">
-                    <h2>Visualizza dati giornalieri</h2>
+                <div class="col-sm-6 pl-3 rightmargin">
+                    <h2>Dati giornalieri</h2>
                     <p>
                         Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 20 secondi)
                     </p>
@@ -607,33 +617,33 @@
                     <form method="POST" action="/weather">
 
                         <div class="row">
-                            <div class="col-sm-2">
+                            <div class="col-2">
                                 <label for="day">Giorno</label>
                             </div>
-                            <div class="col-sm-10">
+                            <div class="col-10">
                                 <input type="date" id="day" name="date" class="forminput" placeholder="Data">
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-2">
+                            <div class="col-2">
                                 <label for="precision">Precisione</label>
                             </div>
-                            <div class="col-sm-10">
+                            <div class="col-10">
                                 <input type="number" class="forminput" id="precision" name="precision" placeholder="Precisione in secondi">
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-12">
                                 <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
                             </div>
                         </div>
                     </form>
                     
                 </div>
-                <div class="col-sm-5">
-                    <div class="text-center">
-                        <h3>Previsioni</h3>
+                <div class="col-sm-6">
+                    <div class="text-center justify-content-center">
+                        <h2>Previsioni</h2>
                         <iframe src="{{ weather['forecast_iframe_address'] }}"  frameborder="0" scrolling="NO" allowtransparency="true" sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox" style="width: 100%; height: 20em"></iframe>
                         <div>
                             <a href="{{ weather['forecast_link_address'] }}" rel="noopener">meteoblue</a>
@@ -649,7 +659,7 @@
             setInterval(getForecast, 2000);
 
             var screen_width = $(window).width();
-            console.log(screen_width)
+
             if (screen_width < 800) {
                 var gauge_size = screen_width * 0.4
                 document.getElementById("outTemp").setAttribute("data-width", gauge_size);
