@@ -9,6 +9,7 @@ import math
 
 from pyaes import PADDING_NONE, AESModeOfOperationECB, Decrypter
 from datetime import datetime
+import time
 
 class BuderusDataManager:
     
@@ -280,3 +281,54 @@ class BuderusDataManager:
         }
 
         return json.dumps(data)
+
+
+    '''
+    Save some daily information about the pump, like the external temperature
+    and the modulation
+    '''
+    def saveGeneralInformation(self):
+        requestUrl = f"/system/sensors/temperatures/outdoor_t1" 
+        externalTemperature = self.buderusRequest(requestUrl)["value"]
+
+        requestUrl = f"/heatSources/actualModulation" 
+        modulation = self.buderusRequest(requestUrl)["value"]
+        
+        now = datetime.now() 
+        date_time = now.strftime("%Y%m%d")
+        unixtime = str(int(time.mktime(now.timetuple())))
+        fileLocation = os.path.join(self.historical_data_location, "daily" , f"{date_time}_buderus.csv")
+
+        if not os.path.isfile(fileLocation):
+            with open(fileLocation, "a") as datafile:
+                datafile.write("dateTime,externalTemperature,modulation\n")
+                datafile.write("{},{},{}\n".format(unixtime, externalTemperature, modulation))
+        else:
+            with open(fileLocation, "a") as datafile:
+                datafile.write("{},{},{}\n".format(unixtime, externalTemperature, modulation))
+
+        return "Success"
+
+    '''
+    Get the daily information about the pump
+    '''
+    def getGeneralInformation(self, date):
+
+        date_time = datetime.strptime(date, '%Y-%m-%d').strftime("%Y%m%d")
+        fileLocation = os.path.join(self.historical_data_location, "daily" , f"{date_time}_buderus.csv")
+
+        data = {}
+        if os.path.isfile(fileLocation):
+            dataframe = pd.read_csv(fileLocation)
+
+            dateTime = dataframe.iloc[:,0].values
+            externalTemperature = dataframe.iloc[:,1].values
+            modulation = dataframe.iloc[:,2].values
+            
+            data = {
+                "dateTime" : dateTime.tolist(),
+                "externalTemperature" : externalTemperature.tolist(),
+                "modulation": modulation.tolist()
+            }
+
+        return data

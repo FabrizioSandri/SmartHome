@@ -9,8 +9,14 @@ class Custom extends Chart.LineController {
             var activePoint = this.chart.tooltip._active[0];
 
             var x = activePoint.element.x;
-            var topY = this.chart.scales['y'].top;
-            var bottomY = this.chart.scales['y'].bottom;
+            
+            var keys = Object.keys(this.chart.scales);
+            var y_key = keys.find(function (el) {
+                return el.startsWith("y");
+            });
+            
+            var topY = this.chart.scales[y_key].top;
+            var bottomY = this.chart.scales[y_key].bottom;
             
             // draw line
             ctx.save();

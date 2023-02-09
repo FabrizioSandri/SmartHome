@@ -2,13 +2,59 @@ let dailyConsumedEnergyChart;
 let monthlyConsumedEnergyChart;
 let dailyTemperaturesChart;
 
+function getAverages(generalInformation, date) {
+
+    let avgs = {
+        "externalTemperature" : [],
+        "modulation" : []
+    }
+    
+    let dataForDate = Object.keys(generalInformation).length > 0;
+    if (!dataForDate){
+        return avgs;
+    }
+
+    for (let hour=0; hour<24; hour++){
+        paddedHour = (hour <= 9 ? `0${hour}` : `${hour}`);
+        let timestamp = Date.parse(`${date} ${paddedHour}:00`)/1000;
+        let rangeStart = timestamp - 1800;
+        let rangeEnd = timestamp + 1800;
+        
+        let externalTemperature = 0;
+        let modulation = 0;
+        let n = 0;
+        for (var i = 0; i < generalInformation["dateTime"].length; i++) {
+            if (generalInformation["dateTime"][i] >= rangeStart && generalInformation["dateTime"][i] < rangeEnd){
+                externalTemperature += generalInformation["externalTemperature"][i];
+                modulation += generalInformation["modulation"][i];
+                n++;
+            } 
+        }
+        
+        if (n!=0){
+            externalTemperature /= n;
+            modulation /= n;
+            avgs["externalTemperature"].push(externalTemperature);
+            avgs["modulation"].push(modulation);
+        }else{
+            avgs["externalTemperature"].push(null);
+            avgs["modulation"].push(null);
+        }
+        
+        
+    }
+
+    return avgs;
+}
+
 function getConsumedEnergyDaily() {
     date = document.getElementById("day").value;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
-
+            
+     
             consumedEnergy = JSON.parse(this.responseText)
             
             // total daily consumed energy
@@ -22,61 +68,124 @@ function getConsumedEnergyDaily() {
             if (dailyConsumedEnergyChart) { 
                 dailyConsumedEnergyChart.destroy();
             }
+
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200){
+
+                    generalInformation = JSON.parse(this.responseText)
+                    avgGeneralInformation = getAverages(generalInformation, date)
             
-            dailyConsumedEnergyChart = new Chart("energyConsumed-chart", {
-                type: 'bar',
-                data: {
-                    labels: consumedEnergy.hours,
-                    datasets: [
-                        { 
-                            data: consumedEnergy.measure,
-                            label: "Consumo energetico",
-                            borderColor: "black",
-                            backgroundColor: "rgba(44, 62, 80, 0.4)",
-                            borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }
-                    ]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    responsive: true,
-                    scales: {
-                        x: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Orario'
-                            }
+                    dailyConsumedEnergyChart = new Chart("energyConsumed-chart", {
+                        type: 'bar',
+                        data: {
+                            labels: consumedEnergy.hours,
+                            datasets: [
+                                { 
+                                    type: "custom_line",
+                                    data: avgGeneralInformation["externalTemperature"],
+                                    label: "Temperatura esterna",
+                                    position: "start",
+                                    backgroundColor: "rgb(255, 99, 132)",
+                                    borderColor: "rgb(255, 99, 132)",
+                                    borderWidth: 2.2,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    yAxisID: "yExternalTemperature",
+                                    units: "°C"
+                                },{ 
+                                    type: "custom_line",
+                                    data: avgGeneralInformation["modulation"],
+                                    label: "Modulazione",
+                                    borderColor: "#1e3aa7",
+                                    backgroundColor: "#1e3aa7",
+                                    borderWidth: 2.2,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    yAxisID: "yModulation",
+                                    units: "%"
+                                },{ 
+                                    data: consumedEnergy.measure,
+                                    label: "Consumo energetico",
+                                    borderColor: "rgba(44, 62, 80, 0.6)",
+                                    backgroundColor: "rgba(44, 62, 80, 0.2)",
+                                    borderWidth: 2.2,
+                                    yAxisID: "yConsumedEnergy",
+                                    units: "kW/h"
+                                }
+                            ]
                         },
-                        y: {
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Consumo - kW/h'
+                        options: {
+                            interaction: {
+                                mode: 'x'
                             },
-                            ticks: {
-                                beginAtZero: true,
-                                max: Math.max.apply(null, consumedEnergy.measure) + 0.5
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                title: function(TooltipItems){
-                                    return "Orario: " + TooltipItems[0].label ;
+                            maintainAspectRatio: false,
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Orario'
+                                    }
                                 },
-                                label: (TooltipItem) => {
-                                    return "Consumo: " + TooltipItem.formattedValue + ' kW';
+                                yConsumedEnergy: {
+                                    display: true,
+                                    position: "left",
+                                    title: {
+                                        display: true,
+                                        text: 'Consumo - kW/h'
+                                    },
+                                    ticks: {
+                                        beginAtZero: true,
+                                        suggestedMax: 5.0
+                                    }
+                                },
+                                yExternalTemperature: {
+                                    display: true,
+                                    position: "right",
+                                    grid: {
+                                        display: false,
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Temperatura esterna - °C'
+                                    }
+                                },
+                                yModulation: {
+                                    display: false,
+                                    position: "right",
+                                    grid: {
+                                        display: false,
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Modulazione - %'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    intersect: false,
+                                    callbacks: {
+                                        title: function(TooltipItems){
+                                            return "Orario: " + TooltipItems[0].label ;
+                                        },
+                                        label: (TooltipItem) => {
+                                            return `${TooltipItem.dataset.label}: ${TooltipItem.formattedValue} ${TooltipItem.dataset.units}`;
+                                        }
+                                    }
                                 }
                             }
+                            
                         }
-                    }
+                    });
                     
                 }
-            });
+            }
+            
+            xhttp2.open("GET", "buderus/getGeneralInformation?date=" + date, true);
+            xhttp2.send();
             
         }
     }
@@ -292,8 +401,8 @@ function getConsumedEnergyMonthly() {
                         { 
                             data: consumedEnergy.measure,
                             label: "Consumo energetico",
-                            borderColor: "black",
-                            backgroundColor: "rgba(44, 62, 80, 0.4)",
+                            borderColor: "rgba(44, 62, 80, 0.6)",
+                            backgroundColor: "rgba(44, 62, 80, 0.2)",
                             borderWidth: 2.2,
                             pointRadius: 4,
                             pointHoverRadius: 6,

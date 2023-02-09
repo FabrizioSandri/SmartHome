@@ -64,12 +64,9 @@
                     </table>
                 </div>
             </div>
-        </div>
-
-        <hr />
-
-        <!-- dati heatingCircuits -->
-        <div class="container">
+        
+            <hr />
+            <!-- dati heatingCircuits -->
             <h4>Circuiti di riscaldamento</h4>
             <table class="table table-bordered">
                 <thead>
@@ -110,19 +107,15 @@
             
             
 
-            <div class="row card-body">
-                <div class="col-md-6 text-center card">
+            <div class="row">
+                <div class="col-md-6 text-center no-padding rightmargin">
                     <h5>Energia consumata</h5>
                     <h6 id="totalDailyConsumed"></h6>
-                    <div class="card-body chart-card-body">
-                        <canvas id="energyConsumed-chart"></canvas>
-                    </div>
+                    <canvas id="energyConsumed-chart"></canvas>
                 </div>
-                <div class="col-md-6 text-center card">
+                <div class="col-md-6 text-center no-padding">
                     <h5>Temperature circuiti</h5>
-                    <div class="card-body chart-card-body">
-                        <canvas id="temp-chart"></canvas>
-                    </div>
+                    <canvas id="temp-chart"></canvas>
                 </div>
             </div>
         </div>
@@ -141,32 +134,26 @@
                 </div>
             </div>
             
-            <div class="row card-body">                
-                <div class="col-md-6 text-center card">
+            <div class="row">                
+                <div class="col-md-6 text-center no-padding rightmargin">
                     <h5>Energia mensile consumata</h5>
                     <h6 id="totalMonthlyConsumed"></h6>
-                    <div class="card-body chart-card-body">
-                        <canvas id="energyConsumedMonthly-chart"></canvas>
-                    </div>
+                    <canvas id="energyConsumedMonthly-chart"></canvas>
                 </div>
-                <div class="col-md-6 card">
-                    <div class="card-body">
-                        <h5>Download dati</h5>
-                        <p>
-                            Selezionare il mese e anno per cui si vogliono scaricare i dati. <br />
-                            <br /><br />
-                            <b>NOTA:</b> ci vorra del tempo per generare il file CSV. (attendi)
-                        </p>
-            
-                        <form method="GET" action="/buderus/downloadMonthlyPowerConsume">
-                            
-                            <select id="mesedownload" name="mese"></select>
-                            <select id="annodownload" name="anno"></select>
-            
-                            <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
-            
-                        </form>
-                    </div>
+                <div class="col-md-6">
+                    <h5>Download dati</h5>
+                    <p>
+                        Selezionare il mese e anno di cui si vogliono scaricare i dati. 
+                    </p>
+        
+                    <form method="GET" action="/buderus/downloadMonthlyPowerConsume">
+                        
+                        <select id="mesedownload" name="mese"></select>
+                        <select id="annodownload" name="anno"></select>
+        
+                        <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+        
+                    </form>
                 </div>
             </div>
         </div>

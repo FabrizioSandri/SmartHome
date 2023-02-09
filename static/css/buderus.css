@@ -7,13 +7,21 @@ canvas{
 
 
 @media only screen and  (max-width: 43em) {  
-    .chart-card-body {
+    .no-padding {
         padding: 0%;
+    }
+    .rightmargin {
+        border-bottom: 1px solid rgb(189, 189, 189);
     }
 }
 
 @media only screen and  (min-width: 43em) {  
-    .chart-card-body {
+    .no-padding {
         padding: 1.25rem;
     }
+
+    .rightmargin {
+        border-right: 1px solid rgb(189, 189, 189);
+    }
+    
 }
