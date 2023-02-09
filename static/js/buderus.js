@@ -15,7 +15,7 @@ function getAverages(generalInformation, date) {
     }
 
     for (let hour=0; hour<24; hour++){
-        paddedHour = (hour <= 9 ? `0${hour}` : `${hour}`);
+        let paddedHour = (hour <= 9 ? `0${hour}` : `${hour}`);
         let timestamp = Date.parse(`${date} ${paddedHour}:00`)/1000;
         let rangeStart = timestamp - 1800;
         let rangeEnd = timestamp + 1800;
@@ -48,16 +48,16 @@ function getAverages(generalInformation, date) {
 }
 
 function getConsumedEnergyDaily() {
-    date = document.getElementById("day").value;
+    let date = document.getElementById("day").value;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
             
-            consumedEnergy = JSON.parse(this.responseText)
+            let consumedEnergy = JSON.parse(this.responseText)
 
             // total daily consumed energy
-            totalDailyConsumed = 0;
+            let totalDailyConsumed = 0;
             for (let i = 0; i < consumedEnergy.measure.length; i++) {
                 totalDailyConsumed += consumedEnergy.measure[i];
             }
@@ -72,12 +72,12 @@ function getConsumedEnergyDaily() {
             xhttp2.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200){
 
-                    generalInformation = JSON.parse(this.responseText)
-                    avgGeneralInformation = getAverages(generalInformation, date)
+                    let generalInformation = JSON.parse(this.responseText)
+                    let avgGeneralInformation = getAverages(generalInformation, date)
             
                     dailyConsumedEnergyChart = new Chart("energyConsumed-chart", {
                         data: {
-                            labels: consumedEnergy.hours,
+                            labels: [...Array(24).keys()],
                             datasets: [
                                 { 
                                     type: "custom_line",
@@ -190,7 +190,7 @@ function getConsumedEnergyDaily() {
         }
     }
     
-    xhttp.open("GET", "buderus/energyConsumedDaily?date=" + date, true);
+    xhttp.open("GET", "buderus/getDaillyConsumedEnergy?date=" + date, true);
     xhttp.send();
 }
 
@@ -211,13 +211,13 @@ function trimTemperaturesNonZero(temperatures){
 }
 
 function getTemperatures() {
-    date = document.getElementById("day").value;
+    let date = document.getElementById("day").value;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
 
-            temperatures = trimTemperaturesNonZero(JSON.parse(this.responseText));
+            let temperatures = trimTemperaturesNonZero(JSON.parse(this.responseText));
 
             // if the chart already exists destroy it and regenerate a new one
             if (dailyTemperaturesChart) { 
@@ -379,17 +379,17 @@ function getConsumedEnergyMonthly() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
 
-            consumedEnergy = JSON.parse(this.responseText)
+            let consumedEnergy = JSON.parse(this.responseText)
             
             // total monthly consumed energy
-            totalMonthlyConsumed = 0;
+            let totalMonthlyConsumed = 0;
             for (let i = 0; i < consumedEnergy.measure.length; i++) {
                 totalMonthlyConsumed += consumedEnergy.measure[i];
             }
             document.getElementById("totalMonthlyConsumed").innerText = `Consumo totale: ${totalMonthlyConsumed} kWh`
             
             // average consumed energy
-            monthlyAverage = 0;
+            let monthlyAverage = 0;
             consumedEnergy.measure.forEach(function (num) { monthlyAverage += num });
             monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
             
@@ -484,7 +484,7 @@ function getHeaderData() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
 
-            data = JSON.parse(this.responseText)
+            let data = JSON.parse(this.responseText)
             
             document.getElementById("temperaturaEsterna").innerText = data["temperaturaEsterna"] + " °C";
             document.getElementById("modulazionePompa").innerText = data["modulazionePompa"] + " %";
@@ -493,9 +493,9 @@ function getHeaderData() {
             document.getElementById("temperaturaAttuale").innerText = data["temperaturaAttuale"] + " °C";
             
             // creazione tabella circuiti di riscaldamento
-            setPointAmbienteRow = document.getElementById("setPointAmbiente");
-            temperaturaAmbienteRow = document.getElementById("temperaturaAmbiente");
-            temperaturaMandataHcRow = document.getElementById("temperaturaMandataHc");
+            let setPointAmbienteRow = document.getElementById("setPointAmbiente");
+            let temperaturaAmbienteRow = document.getElementById("temperaturaAmbiente");
+            let temperaturaMandataHcRow = document.getElementById("temperaturaMandataHc");
             
             // hc parte da 2 in quanto non siamo interessati a hc 1 (piano 0)
             for (let hc = 1; hc < data["temperatureHc"]["setPointAmbiente"].length; hc++) {

@@ -406,8 +406,8 @@ def buderus():
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
 
-@app.route('/buderus/energyConsumedDaily', methods = ['GET', 'POST'])
-def buderusEnergyConsumedDaily():
+@app.route('/buderus/getDaillyConsumedEnergy', methods = ['GET', 'POST'])
+def buderusGetDaillyConsumedEnergy():
     if session.get("authenticated") :
 
         if request.method == 'GET':
@@ -419,7 +419,25 @@ def buderusEnergyConsumedDaily():
 
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
 
-            return str(buderusDataManager.getConsumedEnergy(date))
+            return jsonify(buderusDataManager.getDaillyConsumedEnergy(date))
+
+        else:
+            return "Method not supported"
+
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
+
+@app.route('/buderus/saveDaillyConsumedEnergy', methods = ['GET', 'POST'])
+def saveDaillyConsumedEnergy():
+    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
+        if request.method == 'GET':
+            date = request.args.get("date", None, None)
+                        
+            if Utilities.checkDate(date) == False: # controllo validita data
+                return "Data errata"
+
+            buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
+            return str(buderusDataManager.saveDaillyConsumedEnergy(date))
 
         else:
             return "Method not supported"

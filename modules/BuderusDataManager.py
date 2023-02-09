@@ -71,62 +71,6 @@ class BuderusDataManager:
         
         return jsonResponse
 
-    '''
-    ritorna l'energia consuamta dalla pompa a calore / caldaia
-    '''
-    def getConsumedEnergy(self, date):
-        requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
-
-        recordings = self.buderusRequest(requestUrl)["recording"]
-        hours = []
-        measure = []
-        for hour in range(0, 24):
-            hours.append(hour)
-
-            # valori
-            value = recordings[hour]["y"]
-            c = recordings[hour]["c"]
-            if c == 0:
-                measure.append(0)
-            else:
-                measure.append(round(float(value) / float(c) , 0))
-                
-
-        consumedEnergy = {
-            "hours" : hours,
-            "measure" : measure
-        }
-
-        return json.dumps(consumedEnergy)
-
-    '''
-    ritorna l'energia Mensile consuamta dalla pompa a calore / caldaia
-    '''
-    def getMonthlyConsumedEnergy(self, date):
-        requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
-
-        recordings = self.buderusRequest(requestUrl)["recording"]
-        days = []
-        measure = []
-        for day in range(0, len(recordings)): # Nota: day parte da 0
-            days.append(day + 1) # +1 perchè day parte da 0
-
-            # valori
-            value = recordings[day]["y"]
-            c = recordings[day]["c"]
-            if c == 0:
-                measure.append(0)
-            else:
-                measure.append(round(float(value) / float(60) , 0) )
-                
-
-        consumedEnergy = {
-            "days" : days,
-            "measure" : measure
-        }
-
-        return json.dumps(consumedEnergy)
-
 
     '''
     ritorna la temperatura di tutti gli heating circuits
@@ -182,6 +126,91 @@ class BuderusDataManager:
 
         return json.dumps(temperatures)
     
+
+
+    '''
+    ritorna l'energia consumata dalla pompa di calore
+    '''
+    def getDaillyConsumedEnergy(self, date):
+        date_time = datetime.strptime(date, '%Y-%m-%d').strftime("%Y%m%d")
+        fileLocation = os.path.join(self.historical_data_location, "consumed" , f"{date_time}_buderus.csv")
+
+        data = {
+            "hours": list(range(0,24)),
+            "measure": [None] * 24
+        }
+        
+        if os.path.isfile(fileLocation):
+            dataframe = pd.read_csv(fileLocation)
+
+            hours = dataframe.iloc[:,0].values
+            measure = dataframe.iloc[:,1].values
+            
+            data = {
+                "hours" : hours.tolist(),
+                "measure" : measure.tolist()
+            }
+
+        return data
+
+    '''
+    ritorna l'energia consuamta dalla pompa a calore / caldaia
+    '''
+    def saveDaillyConsumedEnergy(self, date):
+        requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
+
+        recordings = self.buderusRequest(requestUrl)["recording"]
+        hours = []
+        measure = []
+        for hour in range(0, 24):
+            hours.append(hour)
+
+            value = recordings[hour]["y"]
+            c = recordings[hour]["c"]
+            if c == 0:
+                measure.append(0)
+            else:
+                measure.append(round(float(value) / float(c) , 0))
+                
+        date_time = datetime.strptime(date, "%Y-%m-%d").strftime("%Y%m%d")
+
+        # dump to file
+        fileLocation = os.path.join(self.historical_data_location, "consumed" , f"{date_time}_buderus.csv")
+        dataframe = pd.DataFrame({"hours" : hours, "measure" : measure})
+        dataframe.to_csv(fileLocation, index=False)
+
+        return "Success"
+
+
+
+    '''
+    ritorna l'energia Mensile consuamta dalla pompa a calore / caldaia
+    '''
+    def getMonthlyConsumedEnergy(self, date):
+        requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
+
+        recordings = self.buderusRequest(requestUrl)["recording"]
+        days = []
+        measure = []
+        for day in range(0, len(recordings)): # Nota: day parte da 0
+            days.append(day + 1) # +1 perchè day parte da 0
+
+            # valori
+            value = recordings[day]["y"]
+            c = recordings[day]["c"]
+            if c == 0:
+                measure.append(0)
+            else:
+                measure.append(round(float(value) / float(60) , 0) )
+                
+
+        consumedEnergy = {
+            "days" : days,
+            "measure" : measure
+        }
+
+        return json.dumps(consumedEnergy)
+
     '''
     salva i dati mensili della pompa di calore
     '''
@@ -199,26 +228,16 @@ class BuderusDataManager:
         
         return(monthlyConsumedEnergy)
 
-    '''
-    esporta i dati mensili (specificando il mese tramite il parametro date) in formato csv.
-    Il metodo ritorna la location del file csv generato
-    '''
-    def getMonthlyConsumedEnergyFile(self, date):
-
-        parsedDate = datetime.strptime(date, "%Y-%m")
-
-        month = parsedDate.strftime("%m")
-        year = parsedDate.strftime("%Y")
-        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
-
-
-        return (fileLocation)
 
     '''
     ritorna l'energia consumata mensilmente, presa da file e non direttamente dal sistema buderus
     '''
     def getMonthlyConsumedEnergyFromFile(self, date):
-        fileLocation = self.getMonthlyConsumedEnergyFile(date)
+        parsedDate = datetime.strptime(date, "%Y-%m")
+
+        month = parsedDate.strftime("%m")
+        year = parsedDate.strftime("%Y")
+        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
 
         dataframe = pd.read_csv(fileLocation)
 
@@ -297,7 +316,7 @@ class BuderusDataManager:
         now = datetime.now() 
         date_time = now.strftime("%Y%m%d")
         unixtime = str(int(time.mktime(now.timetuple())))
-        fileLocation = os.path.join(self.historical_data_location, "daily" , f"{date_time}_buderus.csv")
+        fileLocation = os.path.join(self.historical_data_location, "info" , f"{date_time}_buderus.csv")
 
         if not os.path.isfile(fileLocation):
             with open(fileLocation, "a") as datafile:
@@ -315,7 +334,7 @@ class BuderusDataManager:
     def getGeneralInformation(self, date):
 
         date_time = datetime.strptime(date, '%Y-%m-%d').strftime("%Y%m%d")
-        fileLocation = os.path.join(self.historical_data_location, "daily" , f"{date_time}_buderus.csv")
+        fileLocation = os.path.join(self.historical_data_location, "info" , f"{date_time}_buderus.csv")
 
         data = {}
         if os.path.isfile(fileLocation):

@@ -167,6 +167,10 @@
             displayDailyCharts();
             generateOptionsMonthly("mese", "anno");
             generateOptionsMonthly("mesedownload", "annodownload");
+
+            document.getElementById("mese").value = today.getMonth() + 1;
+            document.getElementById("anno").value = today.getFullYear();
+            getConsumedEnergyMonthly();
         </script>
     </body>
 </html>
