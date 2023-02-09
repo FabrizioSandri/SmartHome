@@ -54,9 +54,8 @@ function getConsumedEnergyDaily() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
             
-     
             consumedEnergy = JSON.parse(this.responseText)
-            
+
             // total daily consumed energy
             totalDailyConsumed = 0;
             for (let i = 0; i < consumedEnergy.measure.length; i++) {
@@ -77,7 +76,6 @@ function getConsumedEnergyDaily() {
                     avgGeneralInformation = getAverages(generalInformation, date)
             
                     dailyConsumedEnergyChart = new Chart("energyConsumed-chart", {
-                        type: 'bar',
                         data: {
                             labels: consumedEnergy.hours,
                             datasets: [
@@ -89,8 +87,8 @@ function getConsumedEnergyDaily() {
                                     backgroundColor: "rgb(255, 99, 132)",
                                     borderColor: "rgb(255, 99, 132)",
                                     borderWidth: 2.2,
-                                    pointRadius: 4,
-                                    pointHoverRadius: 6,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 3,
                                     yAxisID: "yExternalTemperature",
                                     units: "°C"
                                 },{ 
@@ -100,11 +98,12 @@ function getConsumedEnergyDaily() {
                                     borderColor: "#1e3aa7",
                                     backgroundColor: "#1e3aa7",
                                     borderWidth: 2.2,
-                                    pointRadius: 4,
-                                    pointHoverRadius: 6,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 3,
                                     yAxisID: "yModulation",
                                     units: "%"
                                 },{ 
+                                    type: 'bar',
                                     data: consumedEnergy.measure,
                                     label: "Consumo energetico",
                                     borderColor: "rgba(44, 62, 80, 0.6)",
@@ -117,7 +116,8 @@ function getConsumedEnergyDaily() {
                         },
                         options: {
                             interaction: {
-                                mode: 'x'
+                                mode: 'nearest',
+                                axis: 'x'
                             },
                             maintainAspectRatio: false,
                             responsive: true,
@@ -136,10 +136,8 @@ function getConsumedEnergyDaily() {
                                         display: true,
                                         text: 'Consumo - kW/h'
                                     },
-                                    ticks: {
-                                        beginAtZero: true,
-                                        suggestedMax: 5.0
-                                    }
+                                    beginAtZero: true,
+                                    max: Math.max.apply(null, consumedEnergy.measure) + 0.5
                                 },
                                 yExternalTemperature: {
                                     display: true,
@@ -150,7 +148,8 @@ function getConsumedEnergyDaily() {
                                     title: {
                                         display: true,
                                         text: 'Temperatura esterna - °C'
-                                    }
+                                    },
+                                    max: Math.round(Math.max.apply(null, avgGeneralInformation["externalTemperature"]) + 1.0)
                                 },
                                 yModulation: {
                                     display: false,
@@ -161,7 +160,8 @@ function getConsumedEnergyDaily() {
                                     title: {
                                         display: true,
                                         text: 'Modulazione - %'
-                                    }
+                                    },
+                                    max: 110
                                 }
                             },
                             plugins: {
@@ -233,53 +233,59 @@ function getTemperatures() {
                             data: temperatures["heatingCircuits"][0],
                             label: "HC1",
                             borderColor: "#0e9aa7",
+                            backgroundColor: "#0e9aa7",
                             fill: false,
                             borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
+                            pointRadius: 3,
+                            pointHoverRadius: 3,
                             hidden: true
                         },
                         { 
                             data: temperatures["heatingCircuits"][1],
                             label: "Piano 1",
                             borderColor: "#f3622d",
+                            backgroundColor: "#f3622d",
                             fill: false,
                             borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            pointRadius: 3,
+                            pointHoverRadius: 3
                         },
                         { 
                             data: temperatures["heatingCircuits"][2],
                             label: "Piano 2",
                             borderColor: "#fbab25",
+                            backgroundColor: "#fbab25",
                             fill: false,
                             borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            pointRadius: 3,
+                            pointHoverRadius: 3
                         },
                         { 
                             data: temperatures["heatingCircuits"][3],
                             label: "Piano 3",
                             borderColor: "#57b757",
+                            backgroundColor: "#57b757",
                             fill: false,
                             borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            pointRadius: 3,
+                            pointHoverRadius: 3
                         },
                         { 
                             data: temperatures["boilerTemperatures"],
                             label: "Acqua sanitaria ",
                             borderColor: "#1e3aa7",
+                            backgroundColor: "#1e3aa7",
                             fill: false,
                             borderWidth: 2.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
+                            pointRadius: 3,
+                            pointHoverRadius: 3
                         }
                     ]
                 },
                 options: {
                     interaction: {
-                        mode: 'x'
+                        mode: 'nearest',
+                        axis: 'x'
                     },
                     maintainAspectRatio: false,
                     responsive: true,
@@ -410,6 +416,10 @@ function getConsumedEnergyMonthly() {
                     ]
                 },
                 options: {
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x'
+                    },
                     maintainAspectRatio: false,
                     responsive: true,
                     scales: {
@@ -428,6 +438,7 @@ function getConsumedEnergyMonthly() {
                     },
                     plugins: {
                         tooltip: {
+                            intersect: false,
                             callbacks: {
                                 title: function(TooltipItems){
                                     return "Giorno: " + TooltipItems[0].label;

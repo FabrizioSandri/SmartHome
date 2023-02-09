@@ -38,62 +38,44 @@
         {% include "navBar.html" %}
         
         <!-- Page content -->
-        <h2>Stazione meteo Davis - casa {{ vars["house_name"] }}</h2>
-        <hr />
 
-        <div class="container">
+        <div class="container infocontainer">
+            <h2>Meteo casa {{ vars["house_name"] }}</h2>
+            <hr />
             <div class="row">
-                <div class="col-md-4 right-hr">
+                <div class="col rightmargin">
                     <form method="POST" action="/weather">
-                        <div class="row">
-                            <h4>Seleziona un altro giorno</h4>
+                        <h4>Seleziona un altro giorno</h4>
+                        <div class="row justify-content-center">
+                            <label for="day">Giorno: </label>
+                            <button class="btn btn-secondary" type="button" onclick="changeDay(-1)">
+                                <span class="fas fa-caret-left"></span>
+                            </button>
+                            <input type="date" id="day" name="date" placeholder="Data" value="{{date}}">
+                            <button class="btn btn-secondary" type="button" onclick="changeDay(1)">
+                                <span class="fas fa-caret-right"></span>
+                            </button>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                <label class="row" for="day">Giorno: </label>
-                            </div>
-                            <div class="col">
-                                <div class="row">
-                                    <button class="btn btn-secondary arrow" type="button" onclick="changeDay(-1)">
-                                        <span class="fas fa-caret-left"></span>
-                                    </button>
-                                    <input class="row" type="date" id="day" name="date" placeholder="Data" value="{{date}}">
-                                    <button class="btn btn-secondary arrow" type="button" onclick="changeDay(1)">
-                                        <span class="fas fa-caret-right"></span>
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="row justify-content-center">
+                            <label for="precision">Precisione: </label>
+                            <input type="number" id="precision" name="precision" placeholder="Precisione in secondi">
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                <label class="row" for="precision">Precisione in secondi: </label>
-                            </div>
-                            <div class="col">
-                                <input class="row" type="number" id="precision" name="precision" placeholder="precision">
-                            </div>
-                        </div>
-                        <div class="row">
+                        <div class="row justify-content-center">
                             <input type="submit" name="getData" class="btn btn-secondary" value="Visualizza dati">
                         </div>
                     </form>
 
                 </div>
-                <div class="col-md-4">
+                <div class="col">
                     <h4>Scarica i dati di oggi</h4>
                     <form method="GET" action="/weather/historical">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col">
-                                    <label for="precisionhistorical">Precisione in secondi: </label>
-                                </div>
-                                <div class="col">
-                                    <input type="number" id="precisionhistorical" name="precisionhistorical" placeholder="Precisione in secondi">
-                                    <input type="hidden" name="datehistorical" value="{{date}}">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <input type="submit" name="getHistory" class="btn btn-secondary" value="Scarica dati">
-                            </div>
+                        <div class="row justify-content-center">
+                            <label for="precisionhistorical">Precisione: </label>
+                            <input type="number" id="precisionhistorical" name="precisionhistorical" placeholder="Precisione in secondi">
+                            <input type="hidden" name="datehistorical" value="{{date}}">
+                        </div>
+                        <div class="row justify-content-center">
+                            <input type="submit" name="getHistory" class="btn btn-secondary" value="Scarica dati">
                         </div>
                         
                     </form>
@@ -106,29 +88,30 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-md-5">
-                    <canvas id="wind-chart"></canvas>
+                <div class="col-lg-6 rightmargin">
+                    <canvas class="chart" id="wind-chart"></canvas>
                 </div>
-                <div class="col-md-5">
-                    <canvas id="temp-chart"></canvas>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-5">
-                    <canvas id="barometer-chart"></canvas>
-                </div>
-                <div class="col-md-5">
-                    <canvas id="humidity-chart"></canvas>
+                <div class="col-lg-6">
+                    <canvas class="chart" id="temp-chart"></canvas>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-5">
-                    <canvas id="rain-chart"></canvas>
+                <div class="col-lg-6 rightmargin">
+                    <canvas class="chart" id="barometer-chart"></canvas>
                 </div>
-                <div class="col-md-5">
+                <div class="col-lg-6">
+                    <canvas class="chart" id="humidity-chart"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 rightmargin">
+                    <canvas class="chart" id="rain-chart"></canvas>
+                </div>
+                <div class="col-lg-6">
                     
-                    <div class="container">
-                        <h4>Statistiche</h4>
+                    <div class="col-lg-6">
+                    
+                        <h2>Massime e minime</h2>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -154,8 +137,9 @@
                                     <td>{{ statistics["min_windSpeed"] }} km/h</td>
                                 </tr>
                             </tbody>
-
+    
                         </table>
+    
                     </div>
 
                 </div>

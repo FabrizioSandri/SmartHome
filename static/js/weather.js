@@ -18,7 +18,8 @@ function displayCharts(chartData) {
         },
         options: {
             interaction: {
-                mode: 'x'
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,
@@ -84,7 +85,8 @@ function displayCharts(chartData) {
         },
         options: {
             interaction: {
-                mode: 'x'
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,
@@ -142,7 +144,8 @@ function displayCharts(chartData) {
         },
         options: {
             interaction: {
-                mode: 'x'
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,
@@ -208,7 +211,8 @@ function displayCharts(chartData) {
         },
         options: {
             interaction: {
-                mode: 'x'
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,
@@ -266,7 +270,8 @@ function displayCharts(chartData) {
         },
         options: {
             interaction: {
-                mode: 'x'
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,

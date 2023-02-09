@@ -7,8 +7,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
                 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/weather.css') }}">
 
         <script src="{{ url_for('static', filename='js/gauge.min.js') }}" ></script>
         
@@ -86,74 +86,6 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
-        <style>
-            
-            .title {
-                margin-bottom: 0.5em;
-            }
-
-            .linear {
-                padding-left: 1px; 
-                padding-right: 1px;
-            }
-
-            .maincontainer{
-                padding: 0.5em .5em .5em;
-                border-radius: 2em;
-                text-align: center;
-                box-shadow: 0 5px 10px rgba(0,0,0,.2);
-                margin-bottom: 10px;
-            }
-
-            .forminput {
-                width: 15em;
-            }
-            
-            #forecasticon {
-                width: 5em;
-                height: 5em;
-            } 
-
-            #forecastrule {
-                margin-left: 1em;
-                line-height: 5em;  
-            }
-
-            a {
-                color: rgb(66, 66, 66);
-            }
-
-            #snow {
-                visibility: hidden;
-            }
-
-            @media only screen and  (min-width: 43em) {  
-                .rightmargin {
-                    border-right: 1px solid rgb(189, 189, 189);
-                }
-            }
-
-            @media only screen and  (max-width: 43em) {  
-                .rightmargin {
-                    border-bottom: 1px solid rgb(189, 189, 189);
-                }
-            }
-            
-            #precipitazioni {
-                width: 100%; 
-                text-align: center; 
-                border-bottom: 1px solid #000; 
-                border-left: 1px solid #000; 
-                border-right: 1px solid #000; 
-                line-height: 0.2em;
-                margin: 10px 0 20px; 
-            }
-            
-            #precipitazioni span{
-                background:#fff; 
-                padding:0 10px; 
-            }
-        </style>
     
     </head>
     <body>
@@ -165,7 +97,7 @@
         <div class="container maincontainer">
             <div class="row">
                 <div class="col">
-                    <h1 class="title">Meteo casa {{ vars["house_name"] }}</h1>
+                    <h2>Meteo casa {{ vars["house_name"] }}</h2>
                 </div>
             </div>
             
