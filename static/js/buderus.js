@@ -17,8 +17,8 @@ function getAverages(generalInformation, date) {
     for (let hour=0; hour<24; hour++){
         let paddedHour = (hour <= 9 ? `0${hour}` : `${hour}`);
         let timestamp = Date.parse(`${date} ${paddedHour}:00`)/1000;
-        let rangeStart = timestamp - 1800;
-        let rangeEnd = timestamp + 1800;
+        let rangeStart = timestamp ;
+        let rangeEnd = timestamp + 3600;
         
         let externalTemperature = 0;
         let modulation = 0;
@@ -169,7 +169,7 @@ function getConsumedEnergyDaily() {
                                     intersect: false,
                                     callbacks: {
                                         title: function(TooltipItems){
-                                            return "Orario: " + TooltipItems[0].label ;
+                                            return `Fascia oraria: ${TooltipItems[0].label}:00 - ${(parseInt(TooltipItems[0].label) + 1)}:00` ;
                                         },
                                         label: (TooltipItem) => {
                                             return `${TooltipItem.dataset.label}: ${TooltipItem.formattedValue} ${TooltipItem.dataset.units}`;
