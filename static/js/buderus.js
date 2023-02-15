@@ -366,8 +366,8 @@ function generateOptionsMonthly(idMese, idAnno){
 }
 
 function getConsumedEnergyMonthly() {
-    year = document.getElementById("anno").value;
-    month = document.getElementById("mese").value;
+    var year = document.getElementById("anno").value;
+    var month = document.getElementById("mese").value;
     
     if (month < 10) { // fix mesi senza 0 davanti
         month = "0" + month;
@@ -391,7 +391,14 @@ function getConsumedEnergyMonthly() {
             // average consumed energy
             let monthlyAverage = 0;
             consumedEnergy.measure.forEach(function (num) { monthlyAverage += num });
-            monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
+            
+            let today = new Date();
+            if (today.getFullYear() == year && ('0' + (today.getMonth() + 1)).slice(-2) == month){
+                monthlyAverage = monthlyAverage / today.getDate();
+            }else{
+                monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
+            }
+            
             
 
             // if the chart already exists destroy it and regenerate a new one
