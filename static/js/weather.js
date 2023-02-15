@@ -12,7 +12,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -32,6 +34,10 @@ function displayCharts(chartData) {
                     },
                     ticks: {
                         maxTicksLimit: 10
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
                     }
                 },
                 y: {
@@ -39,6 +45,13 @@ function displayCharts(chartData) {
                     title: {
                         display: true,
                         text: 'Velocità vento (km/h)'
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
+                    },
+                    ticks: {
+                        count: 6
                     }
                 }
             },
@@ -70,7 +83,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 },
                 { 
                     data: chartData.data["inTemp"],
@@ -79,7 +94,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -99,6 +116,10 @@ function displayCharts(chartData) {
                     },
                     ticks: {
                         maxTicksLimit: 10
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
                     }
                 },
                 y: {
@@ -106,6 +127,13 @@ function displayCharts(chartData) {
                     title: {
                         display: true,
                         text: 'Temperatura (°C)'
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
+                    },
+                    ticks: {
+                        count: 6
                     }
                 }
             },
@@ -138,7 +166,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -158,6 +188,10 @@ function displayCharts(chartData) {
                     },
                     ticks: {
                         maxTicksLimit: 10
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
                     }
                 },
                 y: {
@@ -165,6 +199,13 @@ function displayCharts(chartData) {
                     title: {
                         display: true,
                         text: 'Pressione (hPa)'
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
+                    },
+                    ticks: {
+                        count: 6
                     }
                 }
             },
@@ -196,7 +237,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 },
                 { 
                     data: chartData.data["inHumidity"],
@@ -205,7 +248,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -225,6 +270,10 @@ function displayCharts(chartData) {
                     },
                     ticks: {
                         maxTicksLimit: 10
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
                     }
                 },
                 y: {
@@ -232,6 +281,13 @@ function displayCharts(chartData) {
                     title: {
                         display: true,
                         text: 'Umidità (%)'
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
+                    },
+                    ticks: {
+                        count: 6
                     }
                 }
             },
@@ -264,7 +320,9 @@ function displayCharts(chartData) {
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
-                    pointHoverRadius: 6
+                    pointHoverRadius: 6,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -284,6 +342,10 @@ function displayCharts(chartData) {
                     },
                     ticks: {
                         maxTicksLimit: 10
+                    },
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
                     }
                 },
                 y: {
@@ -292,7 +354,14 @@ function displayCharts(chartData) {
                         display: true,
                         text: 'Pioggia (cm)'
                     },
-                    beginAtZero: true
+                    beginAtZero: true,
+                    grid: {
+                        borderDash: [8, 4],
+                        color: "#7F7F7F"
+                    },
+                    ticks: {
+                        count: 6
+                    }
                 }
             },
             plugins: {

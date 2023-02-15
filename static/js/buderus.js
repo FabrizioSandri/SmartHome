@@ -106,9 +106,10 @@ function getConsumedEnergyDaily() {
                                     type: 'bar',
                                     data: consumedEnergy.measure,
                                     label: "Consumo energetico",
-                                    borderColor: "rgba(44, 62, 80, 0.6)",
-                                    backgroundColor: "rgba(44, 62, 80, 0.2)",
-                                    borderWidth: 2.2,
+                                    borderColor: "rgba(100, 100, 100, 1.0)",
+                                    backgroundColor: "rgba(200, 200, 200, 1.0)",
+                                    borderWidth: 2.3,
+                                    barPercentage: 1.0,
                                     yAxisID: "yConsumedEnergy",
                                     units: "kW/h"
                                 }
@@ -127,6 +128,10 @@ function getConsumedEnergyDaily() {
                                     title: {
                                         display: true,
                                         text: 'Orario'
+                                    },
+                                    grid: {
+                                        borderDash: [8, 4],
+                                        color: "#7F7F7F"
                                     }
                                 },
                                 yConsumedEnergy: {
@@ -137,7 +142,14 @@ function getConsumedEnergyDaily() {
                                         text: 'Consumo - kW/h'
                                     },
                                     beginAtZero: true,
-                                    max: Math.max.apply(null, consumedEnergy.measure) + 0.5
+                                    max: Math.max.apply(null, consumedEnergy.measure) + 0.5,
+                                    grid: {
+                                        borderDash: [8, 4],
+                                        color: "#7F7F7F"
+                                    },
+                                    ticks: {
+                                        count: 6
+                                    }
                                 },
                                 yExternalTemperature: {
                                     display: true,
@@ -295,6 +307,10 @@ function getTemperatures() {
                             title: {
                                 display: true,
                                 text: 'Orario'
+                            },
+                            grid: {
+                                borderDash: [8, 4],
+                                color: "#7F7F7F"
                             }
                         },
                         y: {
@@ -302,6 +318,13 @@ function getTemperatures() {
                             title: {
                                 display: true,
                                 text: 'Temperatura - °C'
+                            },
+                            grid: {
+                                borderDash: [8, 4],
+                                color: "#7F7F7F"
+                            },
+                            ticks: {
+                                count: 6
                             }
                         }
                     },
@@ -414,11 +437,10 @@ function getConsumedEnergyMonthly() {
                         { 
                             data: consumedEnergy.measure,
                             label: "Consumo energetico",
-                            borderColor: "rgba(44, 62, 80, 0.6)",
-                            backgroundColor: "rgba(44, 62, 80, 0.2)",
-                            borderWidth: 2.2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
+                            borderColor: "rgba(100, 100, 100, 1.0)",
+                            backgroundColor: "rgba(200, 200, 200, 1.0)",
+                            borderWidth: 2.3,
+                            barPercentage: 1.0
                         }
                     ]
                 },
@@ -434,12 +456,23 @@ function getConsumedEnergyMonthly() {
                             title: {
                                 display: true,
                                 text: 'Giorno'
+                            },
+                            grid: {
+                                borderDash: [8, 4],
+                                color: "#7F7F7F"
                             }
                         },
                         y: {
                             title: {
                                 display: true,
                                 text: 'Consumo energetico- kW/h'
+                            },
+                            grid: {
+                                borderDash: [8, 4],
+                                color: "#7F7F7F"
+                            },
+                            ticks: {
+                                count: 6
                             }
                         }
                     },
