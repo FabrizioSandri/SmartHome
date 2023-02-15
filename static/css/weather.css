@@ -12,6 +12,7 @@
 @media only screen and  (max-width: 43em) {  
     .rightmargin {
         border-bottom: 1px solid rgb(189, 189, 189);
+        padding-bottom: 1em;
     }
 }
 
@@ -19,6 +20,7 @@
     border-radius: 2em;
     text-align: center;
     box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    padding-bottom: 1em;
     margin-bottom: 10px;
 }
 

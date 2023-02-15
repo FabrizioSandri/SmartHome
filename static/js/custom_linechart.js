@@ -24,7 +24,7 @@ class Custom extends Chart.LineController {
             ctx.moveTo(x, topY);
             ctx.lineTo(x, bottomY);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = 'rgba(138, 138, 138, 0.7)';
+            ctx.strokeStyle = 'rgba(255, 147, 147, 1)';
             ctx.stroke();
             ctx.restore();
         }

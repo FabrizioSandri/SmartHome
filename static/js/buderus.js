@@ -90,7 +90,9 @@ function getConsumedEnergyDaily() {
                                     pointRadius: 3,
                                     pointHoverRadius: 3,
                                     yAxisID: "yExternalTemperature",
-                                    units: "°C"
+                                    units: "°C",
+                                    cubicInterpolationMode: 'monotone',
+                                    tension: 0.4
                                 },{ 
                                     type: "custom_line",
                                     data: avgGeneralInformation["modulation"],
@@ -101,7 +103,9 @@ function getConsumedEnergyDaily() {
                                     pointRadius: 3,
                                     pointHoverRadius: 3,
                                     yAxisID: "yModulation",
-                                    units: "%"
+                                    units: "%",
+                                    cubicInterpolationMode: 'monotone',
+                                    tension: 0.4
                                 },{ 
                                     type: 'bar',
                                     data: consumedEnergy.measure,
@@ -130,8 +134,10 @@ function getConsumedEnergyDaily() {
                                         text: 'Orario'
                                     },
                                     grid: {
-                                        borderDash: [8, 4],
                                         color: "#7F7F7F"
+                                    },
+                                    border: {
+                                        dash: [8, 4]
                                     }
                                 },
                                 yConsumedEnergy: {
@@ -144,8 +150,10 @@ function getConsumedEnergyDaily() {
                                     beginAtZero: true,
                                     max: Math.max.apply(null, consumedEnergy.measure) + 0.5,
                                     grid: {
-                                        borderDash: [8, 4],
                                         color: "#7F7F7F"
+                                    },
+                                    border: {
+                                        dash: [8, 4]
                                     },
                                     ticks: {
                                         count: 6
@@ -250,7 +258,9 @@ function getTemperatures() {
                             borderWidth: 2.2,
                             pointRadius: 3,
                             pointHoverRadius: 3,
-                            hidden: true
+                            hidden: true,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
                         },
                         { 
                             data: temperatures["heatingCircuits"][1],
@@ -260,7 +270,9 @@ function getTemperatures() {
                             fill: false,
                             borderWidth: 2.2,
                             pointRadius: 3,
-                            pointHoverRadius: 3
+                            pointHoverRadius: 3,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
                         },
                         { 
                             data: temperatures["heatingCircuits"][2],
@@ -270,7 +282,9 @@ function getTemperatures() {
                             fill: false,
                             borderWidth: 2.2,
                             pointRadius: 3,
-                            pointHoverRadius: 3
+                            pointHoverRadius: 3,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
                         },
                         { 
                             data: temperatures["heatingCircuits"][3],
@@ -280,7 +294,9 @@ function getTemperatures() {
                             fill: false,
                             borderWidth: 2.2,
                             pointRadius: 3,
-                            pointHoverRadius: 3
+                            pointHoverRadius: 3,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
                         },
                         { 
                             data: temperatures["boilerTemperatures"],
@@ -290,7 +306,9 @@ function getTemperatures() {
                             fill: false,
                             borderWidth: 2.5,
                             pointRadius: 3,
-                            pointHoverRadius: 3
+                            pointHoverRadius: 3,
+                            cubicInterpolationMode: 'monotone',
+                            tension: 0.4
                         }
                     ]
                 },
@@ -309,8 +327,10 @@ function getTemperatures() {
                                 text: 'Orario'
                             },
                             grid: {
-                                borderDash: [8, 4],
                                 color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
                             }
                         },
                         y: {
@@ -320,8 +340,10 @@ function getTemperatures() {
                                 text: 'Temperatura - °C'
                             },
                             grid: {
-                                borderDash: [8, 4],
                                 color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
                             },
                             ticks: {
                                 count: 6
@@ -458,8 +480,10 @@ function getConsumedEnergyMonthly() {
                                 text: 'Giorno'
                             },
                             grid: {
-                                borderDash: [8, 4],
                                 color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
                             }
                         },
                         y: {
@@ -468,8 +492,10 @@ function getConsumedEnergyMonthly() {
                                 text: 'Consumo energetico- kW/h'
                             },
                             grid: {
-                                borderDash: [8, 4],
                                 color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
                             },
                             ticks: {
                                 count: 6

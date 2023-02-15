@@ -8,7 +8,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["windSpeed"],
                     label: "Velocità vento",
-                    borderColor: "#1e3aa7",
+                    borderColor: "#5e92ba",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -36,8 +36,10 @@ function displayCharts(chartData) {
                         maxTicksLimit: 10
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
@@ -47,8 +49,10 @@ function displayCharts(chartData) {
                         text: 'Velocità vento (km/h)'
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     },
                     ticks: {
                         count: 6
@@ -79,7 +83,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["outTemp"],
                     label: "Temperatura esterna",
-                    borderColor: "#57b757",
+                    borderColor: "rgb(255, 99, 132)",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -90,7 +94,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["inTemp"],
                     label: "Temperatura interna",
-                    borderColor: "#f3622d",
+                    borderColor: "#5e92ba",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -118,8 +122,10 @@ function displayCharts(chartData) {
                         maxTicksLimit: 10
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
@@ -129,8 +135,10 @@ function displayCharts(chartData) {
                         text: 'Temperatura (°C)'
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     },
                     ticks: {
                         count: 6
@@ -162,7 +170,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["barometer"],
                     label: "Pressione atmosferica",
-                    borderColor: "#fbab25",
+                    borderColor: "#5e92ba",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -190,8 +198,10 @@ function displayCharts(chartData) {
                         maxTicksLimit: 10
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
@@ -201,8 +211,10 @@ function displayCharts(chartData) {
                         text: 'Pressione (hPa)'
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     },
                     ticks: {
                         count: 6
@@ -233,7 +245,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["outHumidity"],
                     label: "Umidità esterna",
-                    borderColor: "#57b757",
+                    borderColor: "rgb(255, 99, 132)",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -244,7 +256,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["inHumidity"],
                     label: "Umidità interna",
-                    borderColor: "#f3622d",
+                    borderColor: "#5e92ba",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -272,8 +284,10 @@ function displayCharts(chartData) {
                         maxTicksLimit: 10
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
@@ -283,8 +297,10 @@ function displayCharts(chartData) {
                         text: 'Umidità (%)'
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     },
                     ticks: {
                         count: 6
@@ -316,7 +332,7 @@ function displayCharts(chartData) {
                 { 
                     data: chartData.data["dayRain"],
                     label: "Pioggia giornaliera",
-                    borderColor: "#ef6c00",
+                    borderColor: "#5e92ba",
                     fill: false,
                     borderWidth: 3.5,
                     pointRadius: 1,
@@ -344,8 +360,10 @@ function displayCharts(chartData) {
                         maxTicksLimit: 10
                     },
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
@@ -356,8 +374,10 @@ function displayCharts(chartData) {
                     },
                     beginAtZero: true,
                     grid: {
-                        borderDash: [8, 4],
                         color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     },
                     ticks: {
                         count: 6
