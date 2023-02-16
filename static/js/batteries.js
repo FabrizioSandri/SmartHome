@@ -197,9 +197,11 @@ function displayCharts(powerProduced, powerProducedCompare) {
                     backgroundColor: "rgba(251, 192, 45, 0.4)",
                     borderColor: "#e67e22",
                     fill: true,
-                    borderWidth: 2.2,
-                    pointRadius: 3,
-                    pointHoverRadius: 3
+                    borderWidth: 3.5,
+                    pointRadius: 1,
+                    pointHoverRadius: 1,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 },
                 { 
                     data: powerProducedCompare["value"],
@@ -207,9 +209,11 @@ function displayCharts(powerProduced, powerProducedCompare) {
                     backgroundColor: "rgba(81, 81, 81, 0.2)",
                     borderColor: "rgba(81, 81, 81, 0.8)",
                     fill: true,
-                    borderWidth: 2.2,
-                    pointRadius: 3,
-                    pointHoverRadius: 3
+                    borderWidth: 3.5,
+                    pointRadius: 1,
+                    pointHoverRadius: 1,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
@@ -228,23 +232,38 @@ function displayCharts(powerProduced, powerProducedCompare) {
                         text: 'Orario'
                     },
                     ticks: {
-                        maxTicksLimit: 10
+                        maxTicksLimit: 12
+                    },
+                    grid: {
+                        color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
                     }
                 },
                 y: {
                     display: true,
                     title: {
                         display: true,
-                        text: 'Energia prodotta - kW/h'
+                        text: 'Energia prodotta (kW/h)'
+                    },
+                    grid: {
+                        color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
+                    },
+                    ticks: {
+                        count: 7
                     }
                 }
             },
             plugins: {
                 tooltip: {
                     intersect: false,
-                    callbacks: {
+                    callbacks: {                        
                         title: function(TooltipItems){
-                            return `Ore ${TooltipItems[0].label} `;
+                            return `Ore ${TooltipItems[0].label}`;
                         },
                         label: (TooltipItem) => {
                             return TooltipItem.dataset.label + ": " + TooltipItem.formattedValue + ' kW/h';
