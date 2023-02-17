@@ -1,24 +1,80 @@
-canvas{
+.chart{
     height: 400px;
 }
 
-@media only screen and  (max-width: 43em) {  
-    .right-hr {
-        border-right: 1px solid gray;
-    }
-}
 
 @media only screen and  (min-width: 43em) {  
-    .right-hr {
-        border-right: none;
+    .rightmargin {
+        border-right: 1px solid rgb(189, 189, 189);
     }
 }
 
-.container {
-    min-width: 90%;
+@media only screen and  (max-width: 43em) {  
+    .rightmargin {
+        border-bottom: 1px solid rgb(189, 189, 189);
+        padding-bottom: 1em;
+    }
+
+    .col {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
 }
 
-.arrow {
+.infocontainer{
+    border-radius: 2em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    padding-bottom: 1em;
+    margin-bottom: 10px;
+}
+
+.title {
+    margin-bottom: 0.5em;
+}
+
+.linear {
+    padding-left: 1px; 
+    padding-right: 1px;
+}
+
+.maincontainer{
+    border-radius: 2em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    margin-bottom: 10px;
+}
+
+.forminput {
+    width: 15em;
+}
+
+#forecasticon {
+    width: 5em;
+    height: 5em;
+} 
+
+#forecastrule {
     margin-left: 1em;
-    margin-right: 1em;
+    line-height: 5em;  
+}
+
+a {
+    color: rgb(66, 66, 66);
+}
+
+
+#precipitazioni {
+    width: 100%; 
+    text-align: center; 
+    border-bottom: 1px solid #000; 
+    border-left: 1px solid #000; 
+    border-right: 1px solid #000; 
+    line-height: 0.2em;
+    margin: 10px 0 20px; 
+}
+
+#precipitazioni span{
+    background:#fff; 
+    padding:0 10px; 
 }

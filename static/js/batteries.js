@@ -185,8 +185,9 @@ function displayCharts(powerProduced, powerProducedCompare) {
         actualChart.destroy();
     }
 
+
     actualChart = new Chart("production-chart", {
-        type: 'line',
+        type: 'custom_line',
         data: {
             labels: powerProduced["time"],
             datasets: [
@@ -195,37 +196,78 @@ function displayCharts(powerProduced, powerProducedCompare) {
                     label: "Energia prodotta",
                     backgroundColor: "rgba(251, 192, 45, 0.4)",
                     borderColor: "#e67e22",
-                    fill: true
+                    fill: true,
+                    borderWidth: 3.5,
+                    pointRadius: 1,
+                    pointHoverRadius: 1,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 },
                 { 
                     data: powerProducedCompare["value"],
                     label: "Confronto energia prodotta",
                     backgroundColor: "rgba(81, 81, 81, 0.2)",
                     borderColor: "rgba(81, 81, 81, 0.8)",
-                    fill: true
+                    fill: true,
+                    borderWidth: 3.5,
+                    pointRadius: 1,
+                    pointHoverRadius: 1,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
                 }
             ]
         },
         options: {
-            title: {
-                display: true,
-            },
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        maxTicksLimit: 10
-                    }
-                }]
+            interaction: {
+                mode: 'nearest',
+                axis: 'x'
             },
             maintainAspectRatio: false,
             responsive: true,
-            tooltips: {
-                callbacks: {
-                    title: function(tooltipItem){
-                        return "Orario: " + this._data.labels[tooltipItem[0].index];
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Orario'
                     },
-                    label: (tooltipItems, data) => {
-                        return "Potenza istantanea: " + data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index] + ' kWh';
+                    ticks: {
+                        maxTicksLimit: 12
+                    },
+                    grid: {
+                        color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
+                    }
+                },
+                y: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Energia prodotta (kW/h)'
+                    },
+                    grid: {
+                        color: "#7F7F7F"
+                    },
+                    border: {
+                        dash: [8, 4]
+                    },
+                    ticks: {
+                        count: 7
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    intersect: false,
+                    callbacks: {                        
+                        title: function(TooltipItems){
+                            return `Ore ${TooltipItems[0].label}`;
+                        },
+                        label: (TooltipItem) => {
+                            return TooltipItem.dataset.label + ": " + TooltipItem.formattedValue + ' kW/h';
+                        }
                     }
                 }
             }

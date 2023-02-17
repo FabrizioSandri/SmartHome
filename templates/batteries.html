@@ -1,4 +1,3 @@
-{% set solar = teslaData["aggregates"]["solar"]["instant_power"] %}
 {% set site = teslaData["aggregates"]["site"]["instant_power"] %}
 {% set load = teslaData["aggregates"]["load"]["instant_power"] %}
 {% set battery = teslaData["aggregates"]["battery"]["instant_power"] %}
@@ -8,21 +7,23 @@
 {% elif battery < 0 %}
     {% set chargeEstimation = (27 - 27 * teslaData['batteryPercentage']/100) / battery|abs %}
 {% endif %}
-
+<!DOCTYPE html>
 <html>
     <head>
         <title>Impianto solare</title>
-
-        <script  src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+ 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.2.1/chart.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.2/chartjs-plugin-annotation.js"></script>        
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
              
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/batteries.css') }}">
 
+        <script src="{{ url_for('static', filename='js/custom_linechart.js') }}" ></script>
         <script src="{{ url_for('static', filename='js/batteries.js') }}" ></script>
 
         
@@ -116,12 +117,7 @@
                     <div class="card">
                         <h2>Dettagli impianto</h2>
                         <table class="table">
-                            
                             <tbody>
-                                <tr>
-                                    <td>Potenza solare attuale</td>
-                                    <td>{{ solar | abs }} kW</td>
-                                </tr>
                                 <tr>
                                     <td>Energia generata oggi</td>
                                     <td>{{ siteDetails["lastDayEnergy"] }} kWh</td>
@@ -135,9 +131,7 @@
                                     <td>{{ siteDetails["lastYearEnergy"] }} kWh</td>
                                 </tr>
                             </tbody>                   
-        
                         </table>
-        
                     </div>
 
                     <div class="card">

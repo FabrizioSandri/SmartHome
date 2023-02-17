@@ -1,6 +1,37 @@
-canvas{
-    height: 28em;
-    max-height: 28em;
-    min-height: 28em;
-    max-width: 100%;
+
+
+
+@media only screen and  (max-width: 50em) {  
+    .no-padding {
+        padding: 0%;
+    }
+    .rightmargin {
+        border-bottom: 1px solid rgb(189, 189, 189);
+    }
+
+    canvas{
+        height: 20em;
+        max-height: 20em;
+        min-height: 20em;
+        max-width: 100%;
+    }
+
+}
+
+@media only screen and  (min-width: 50em) {  
+    .no-padding {
+        padding: 1.25rem;
+    }
+
+    .rightmargin {
+        border-right: 1px solid rgb(189, 189, 189);
+    }
+
+    canvas{
+        height: 28em;
+        max-height: 28em;
+        min-height: 28em;
+        max-width: 100%;
+    }
+    
 }

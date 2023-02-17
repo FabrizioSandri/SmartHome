@@ -200,14 +200,14 @@
         "200": "Unknown forecast rule."
     },
     "forecastIcon" : {
-        "2" : ["cloud"],
-        "3" : ["cloud-showers-heavy"],
-        "6" : ["cloud-sun"],
-        "7" : ["cloud-sun-rain"],
-        "8" : ["sun"],
-        "18": ["cloud", "snowflake"],
-        "19": ["cloud-showers-heavy", "snowflake"],
-        "22": ["cloud-sun", "snowflake"],
-        "23": ["cloud-sun-rain", "snowflake"]
+        "2" : "cloudy.svg",
+        "3" : "rain.svg",
+        "6" : "partly-cloudy-day.svg",
+        "7" : "partly-cloudy-day-rain.svg",
+        "8" : "clear-day.svg",
+        "18": "snow.svg",
+        "19": "sleet.svg",
+        "22": "partly-cloudy-day-snow.svg",
+        "23": "partly-cloudy-day-sleet.svg"
     }
 }
