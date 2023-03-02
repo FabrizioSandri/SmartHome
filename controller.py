@@ -115,17 +115,17 @@ def download_historical_file():
         if request.method == 'GET':
 
             date = request.args.get("datehistorical", None, None)
-            precision = request.args.get("precisionhistorical", None, None)
-
+            precision = request.args.get("precisionhistorical", envData["weather"]["default_chart_gap"], int)
+            
             filename = f"{envData['weather']['historical_data_prefix']}-{date}.csv"
 
-            if filename != ""  and precision.isnumeric():
+            if filename != ""  and precision:
                 
                 fileLocation = os.path.join(envData["weather"]["historical_data_location"], filename)
                 precision = int(precision)
                 
                 if os.path.isfile(fileLocation):
-                    newFileLocation = WeatherDataManager.getFitleredHisoricalFile(fileLocation, envData["weather"]["historical_data_prefix"], precision)
+                    newFileLocation = WeatherDataManager.getFitleredHisoricalFile(fileLocation, precision)
 
                     return send_file(newFileLocation)
                 else:
@@ -146,28 +146,24 @@ def download_monthly_historical_file():
 
             month = request.args.get("mese", None, None)
             year = request.args.get("anno", None, None)
-            precision = request.args.get("precisionMonth", None, None)
 
             if int(month) < 10:
                 month = '0' + month
 
-            if precision.isnumeric():
-                fileLocationFirstOfMonth = os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}-{year}-{month}-01.csv")
+            fileLocationFirstOfMonth = os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}-{year}-{month}-01.csv")
 
-                # se il file del 1 del mese esiste allora ok
-                if os.path.isfile(fileLocationFirstOfMonth):
+            # se il file del 1 del mese esiste allora ok
+            if os.path.isfile(fileLocationFirstOfMonth):
 
-                    monthDatasetLocation = WeatherDataManager.getMonthFitleredHisoricalFile(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], year, month, precision)
-                    if monthDatasetLocation != 0:
-                        return send_file(monthDatasetLocation)
-                    else:
-                        return "Errore nell'estrazione dei dati"
-                
+                monthDatasetLocation = WeatherDataManager.getMonthHisoricalFile(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], year, month)
+                if monthDatasetLocation != 0:
+                    return send_file(monthDatasetLocation)
                 else:
-                    return "Nessun dato trovato per il mese specificato"
-
+                    return "Errore nell'estrazione dei dati"
+            
             else:
-                return "Specifica una precisione in secondi corretta"
+                return "Nessun dato trovato per il mese specificato"
+
         else:
             return "Method not supported"
 
@@ -607,7 +603,7 @@ def buderusTesting():
             path = request.args.get("path", None, None)
             buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
             recordings = buderusDataManager.buderusRequest(path)
-
+            
             return jsonify(recordings)
         else:
             return "Method not supported"

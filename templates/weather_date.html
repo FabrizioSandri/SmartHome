@@ -16,6 +16,36 @@
         
         <script>
             
+            function generateDownloadHistoryOptions(){
+                var optionMese = document.getElementById("mese");
+                var optionAnno = document.getElementById("anno");
+
+                var currentYear = new Date().getFullYear();
+                var startYear = 2021; // dati dal 2021 in poi
+
+                var years = [];
+                var months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+                while (startYear <= currentYear){
+                    years.push(startYear++);
+                }
+
+                years.forEach((year) => {
+                    let optionYear = document.createElement("option");
+                    optionYear.setAttribute("value", "" + year);
+                    optionYear.innerText = year;
+
+                    optionAnno.appendChild(optionYear);
+                });
+
+                months.forEach((month) => {
+                    let optionMonth = document.createElement("option");
+                    optionMonth.setAttribute("value", "" + month);
+                    optionMonth.innerText = month;
+
+                    optionMese.appendChild(optionMonth);
+                });
+            }
 
             // get forecast for today
             function getForecast() {
@@ -550,7 +580,7 @@
                 <div class="col-sm-6 pl-3 rightmargin">
                     <h2>Dati giornalieri</h2>
                     <p>
-                        Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 20 secondi)
+                        Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 500 secondi)
                     </p>
 
                     <form method="POST" action="/weather">
@@ -578,6 +608,21 @@
                             </div>
                         </div>
                     </form>
+
+                    <hr />
+
+                    <h2>Scarica i dati mensili</h2>
+                    <p>
+                        Scarica i dati di un mese specifico. Nota che ci vorrà quale minuto per generare il file CSV.
+                    </p>
+
+                    <form method="GET" action="/weather/historicalMonth">
+                        
+                        <select id="mese" name="mese"></select>
+                        <select id="anno" name="anno"></select>
+                        <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+
+                    </form>
                     
                 </div>
                 <div class="col-sm-6">
@@ -595,7 +640,8 @@
 
         <script>
             getForecast();
-            setInterval(getForecast, 2000);
+            generateDownloadHistoryOptions();
+            // setInterval(getForecast, 2000);
 
             var screen_width = $(window).width();
 

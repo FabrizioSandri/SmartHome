@@ -211,6 +211,15 @@ class BuderusDataManager:
 
         return json.dumps(consumedEnergy)
 
+    def getMonthlyConsumedEnergyFile(self, date):
+        parsedDate = datetime.strptime(date, "%Y-%m")
+
+        month = parsedDate.strftime("%m")
+        year = parsedDate.strftime("%Y")
+        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
+
+        return (fileLocation)
+
     '''
     salva i dati mensili della pompa di calore
     '''
