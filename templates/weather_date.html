@@ -560,16 +560,25 @@
             <div class="row border-top pt-2 p-3">
                 <div class="rightmargin col-sm-6">
                     <h5>Previsione</h5>
-                    <div class="row justify-content-center">
-                        <img id="forecasticon" src="/static/weathericons/clear-day.svg" alt="-">
-                        <p id="forecastrule"></p>
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col-sm-3">
+                            <img id="forecasticon" src="/static/weathericons/clear-day.svg" alt="-">
+                        </div>
+                        <div class="col-sm-9" id="forecastrule">
+
+                        </div>
+                        
                     </div>
                     
                 </div>
                 <div class="col-sm-6">
                     <h5>Alba e tramonto</h5>
-                    <p>Alba: <span id="sunrise">-</span></p>
-                    <p>Tramonto: <span id="sunset">-</span></p>
+                    <div class="row justify-content-center align-items-center">
+                        Alba: <span id="sunrise">-</span>
+                    </div>
+                    <div class="row justify-content-center align-items-center">
+                        Tramonto: <span id="sunset">-</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -641,7 +650,7 @@
         <script>
             getForecast();
             generateDownloadHistoryOptions();
-            // setInterval(getForecast, 2000);
+            setInterval(getForecast, 2000);
 
             var screen_width = $(window).width();
 

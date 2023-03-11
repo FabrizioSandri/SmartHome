@@ -132,6 +132,9 @@ class WeatherDataManager:
         
         outFileName = f"/tmp/{historical_prefix}-{year}-{month}.csv"
 
+        if os.path.isfile(outFileName):
+            return (outFileName)
+            
         monthDatasets = []
         
         for day in range(1, 32):
