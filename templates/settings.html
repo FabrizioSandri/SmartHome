@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Impostazioni</title>
+ 
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+             
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/navbar.css') }}">
+        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/settings.css') }}">
+
+        <script src="{{ url_for('static', filename='js/settings.js') }}" ></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+    </head>
+    <body>
+
+        <!-- Nav Bar -->
+        {% include "navBar.html" %}
+        
+        <!-- Page content -->
+        <div class="container" id="maincontainer">
+            <div class="row">
+                <div class="col-sm-6">
+                    <form>
+                        <h3>Interfaccia</h3>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="old_password">Vecchia password</label>
+                                <input type="password" class="form-control" id="old_password">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="new_password1">Nuova password</label>
+                                <input type="password" class="form-control" id="new_password1">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="new_password2">Ripeti password</label>
+                                <input type="password" class="form-control" id="new_password2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="house_name">Nome casa</label>
+                            <input type="text" class="form-control" id="house_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="weather_location">Localizzazione</label>
+                            <input type="text" class="form-control" id="weather_location">
+                        </div>
+                    </form>
+                    
+                </div>
+
+                <div class="col-sm-6">
+                    <form>
+                        <h3>Stazione meteo</h3>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="weather_historical_data_location">Dati storici</label>
+                                <input type="text" class="form-control" id="weather_historical_data_location">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="historical_data_prefix">Prefisso dati storici</label>
+                                <input type="text" class="form-control" id="historical_data_prefix">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="default_chart_gap">Intervallo grafici(secondi)</label>
+                            <input type="number" class="form-control" id="default_chart_gap">
+                        </div>
+                    </form>
+                    
+                </div>
+               
+            </div>
+
+
+            <div class="row">
+                
+                <div class="col-sm-6">
+                    <form>
+                        <h3>Impianto solare</h3>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="api_key">Chiave API Solaredge</label>
+                                <input type="text" class="form-control" id="api_key">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="site_id">Site id Solaredge</label>
+                                <input type="text" class="form-control" id="site_id">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="tesla_gateway_ip">IP Tesla</label>
+                                <input type="text" class="form-control" id="tesla_gateway_ip">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="gateway_email">E-mail Tesla</label>
+                                <input type="email" class="form-control" id="gateway_email">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="gateway_password">Password Tesla</label>
+                                <input type="password" class="form-control" id="gateway_password">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="device_ip">IP Elios4you</label>
+                                <input type="text" class="form-control" id="device_ip">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="device_port">Porta Elios4you</label>
+                                <input type="number" class="form-control" id="device_port">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-sm-6">
+                    <form>
+                        <h3>Impianto Buderus</h3>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="buderus_gateway_ip">IP Buderus</label>
+                                <input type="text" class="form-control" id="buderus_gateway_ip">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="buderus_gateway_password">Password Buderus</label>
+                                <input type="password" class="form-control" id="buderus_gateway_password">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="download_secret">Chiave download</label>
+                                <input type="text" class="form-control" id="download_secret">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="gateway_secret">Chiave gateway</label>
+                                <input type="password" class="form-control" id="gateway_secret">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="buderus_historical_data_location">Dati storici</label>
+                            <input type="text" class="form-control" id="buderus_historical_data_location">
+                        </div>
+                    </form>
+                </div>
+               
+            </div>
+
+
+            <div class="row">
+                
+                <div class="col-sm-12">
+                    <form>
+                        <h3>Sorveglianza</h3>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <fieldset class="border p-2">
+                                    <legend id="cam1_name"></legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam1_ip">Indirizzo IP</label>
+                                            <input type="text" class="form-control" id="cam1_ip">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam1_rtsp_port">Porta RTSP</label>
+                                            <input type="number" class="form-control" id="cam1_rtsp_port">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam1_username">Username</label>
+                                            <input type="text" class="form-control" id="cam1_username">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam1_password">Password</label>
+                                            <input type="password" class="form-control" id="cam1_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cam1_stream">Stream</label>
+                                        <input type="text" class="form-control" id="cam1_stream">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-sm-4">
+                                <fieldset class="border p-2">
+                                    <legend id="cam2_name"></legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam2_ip">Indirizzo IP</label>
+                                            <input type="text" class="form-control" id="cam2_ip">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam2_rtsp_port">Porta RTSP</label>
+                                            <input type="number" class="form-control" id="cam2_rtsp_port">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam2_username">Username</label>
+                                            <input type="text" class="form-control" id="cam2_username">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam2_password">Password</label>
+                                            <input type="password" class="form-control" id="cam2_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cam2_stream">Stream</label>
+                                        <input type="text" class="form-control" id="cam2_stream">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-sm-4">
+                                <fieldset class="border p-2">
+                                    <legend id="cam3_name"></legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam3_ip">Indirizzo IP</label>
+                                            <input type="text" class="form-control" id="cam3_ip">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam3_rtsp_port">Porta RTSP</label>
+                                            <input type="number" class="form-control" id="cam3_rtsp_port">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam3_username">Username</label>
+                                            <input type="text" class="form-control" id="cam3_username">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam3_password">Password</label>
+                                            <input type="password" class="form-control" id="cam3_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cam3_stream">Stream</label>
+                                        <input type="text" class="form-control" id="cam3_stream">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <fieldset class="border p-2">
+                                    <legend id="cam4_name"></legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam4_ip">Indirizzo IP</label>
+                                            <input type="text" class="form-control" id="cam4_ip">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam4_rtsp_port">Porta RTSP</label>
+                                            <input type="number" class="form-control" id="cam4_rtsp_port">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam4_username">Username</label>
+                                            <input type="text" class="form-control" id="cam4_username">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam4_password">Password</label>
+                                            <input type="password" class="form-control" id="cam4_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cam4_stream">Stream</label>
+                                        <input type="text" class="form-control" id="cam4_stream">
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col-sm-4">
+                                <fieldset class="border p-2">
+                                    <legend id="cam5_name"></legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam5_ip">Indirizzo IP</label>
+                                            <input type="text" class="form-control" id="cam5_ip">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam5_rtsp_port">Porta RTSP</label>
+                                            <input type="number" class="form-control" id="cam5_rtsp_port">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="cam5_username">Username</label>
+                                            <input type="text" class="form-control" id="cam5_username">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="cam5_password">Password</label>
+                                            <input type="password" class="form-control" id="cam5_password">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cam5_stream">Stream</label>
+                                        <input type="text" class="form-control" id="cam5_stream">
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-secondary" onclick="save_settings()">Salva</button>
+                    <p id="save_result"></p>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <script>
+            load_settings({{ envData | tojson}});
+        </script>
+        
+
+    </body>
+</html>
