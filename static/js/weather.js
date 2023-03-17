@@ -325,7 +325,7 @@ function displayCharts(chartData) {
 
 
     new Chart("rain-chart", {
-        type: 'line',
+        type: 'custom_line',
         data: {
             labels: chartData.labels,
             datasets: [
