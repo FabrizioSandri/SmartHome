@@ -61,7 +61,7 @@ class BuderusDataManager:
             'Connection': 'Close'
         }
         
-        requestUrl = self.gateway_ip + requestUrl
+        requestUrl = "http://" + self.gateway_ip + requestUrl
 
         # decodifica della risposta
         encryptedResponse = requests.get(requestUrl, headers=headers, verify=False)
