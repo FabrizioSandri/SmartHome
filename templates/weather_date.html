@@ -81,7 +81,7 @@
                         let yearRain = parseFloat(result["yearRain"]).toFixed(1);
 
 
-                        // handle daily rain overflow
+                        // handle rain overflows
                         if (dayRain >= 1){
                             let maxRain = Math.ceil(dayRain);
                             document.getElementById("dayRain").setAttribute("data-max-value", maxRain);    
@@ -90,6 +90,16 @@
                                 evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
                             }
                             document.getElementById("dayRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
+                        }
+
+                        if (monthRain >= 10){
+                            let maxRain = Math.ceil(monthRain / 10) * 10;
+                            document.getElementById("monthRain").setAttribute("data-max-value", maxRain);    
+                            let evenlySpaced = [];
+                            for (let i = 0; i <= 10; i++) {
+                                evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
+                            }
+                            document.getElementById("monthRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
                         }
 
                         document.getElementById("forecasticon").setAttribute("src", "/static/weathericons/" + forecast_icon);
