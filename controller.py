@@ -445,7 +445,7 @@ def buderusgetGeneralData():
     if session.get("authenticated") :
             
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        data = buderusDataManager.getHeaderData()
+        data = buderusDataManager.getGeneralData()
 
         return data
 

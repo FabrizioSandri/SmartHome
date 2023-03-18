@@ -263,7 +263,7 @@ class BuderusDataManager:
     '''
     ottiene dati generali sull'impianto
     '''
-    def getHeaderData(self):
+    def getGeneralData(self):
         heatingCircuitsNum = 4
 
         requestUrl = f"/dhwCircuits/dhw1/currentSetpoint" 
