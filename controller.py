@@ -13,7 +13,6 @@ from modules.BuderusDataManager import BuderusDataManager
 from modules.Camera import Camera
 from Utilities import Utilities
 
-import time
 import json
 import os
 
@@ -191,15 +190,14 @@ def batteries():
 @app.route('/getEnergyProduced', methods = ['GET'])
 def getEnergyProduced():
     if session.get("authenticated") :
+        date = request.args.get("date", None, None)
+        if Utilities.checkDate(date) == False:
+            return "Data errata"
 
-            date = request.args.get("date", None, None)
-            if Utilities.checkDate(date) == False:
-                return "Data errata"
-
-            batteriesDataManager = BatteriesDataManager(session, envData["solaredge"], envData["tesla"], envData["elios4you"])
-            energyProduced = batteriesDataManager.getEnergyProduced(date)
-            
-            return energyProduced
+        batteriesDataManager = BatteriesDataManager(session, envData["solaredge"], envData["tesla"], envData["elios4you"])
+        energyProduced = batteriesDataManager.getEnergyProduced(date)
+        
+        return energyProduced
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
@@ -337,8 +335,8 @@ def buderus():
 
 @app.route('/buderus/getDaillyConsumedEnergy', methods = ['GET'])
 def buderusGetDaillyConsumedEnergy():
-    if session.get("authenticated") :
-        
+    if session.get("authenticated"):
+
         date = request.args.get("date", None, None)        
         if Utilities.checkDate(date) == False: # controllo validita data
             return "Data errata"
@@ -416,7 +414,6 @@ def buderusTemperatures():
 
     else: # need to authenticate
         return render_template("login.html")
-
 
 @app.route('/buderus/downloadMonthlyPowerConsume', methods = ['GET'])
 def buderusDownloadMonthlyPowerConsume():
