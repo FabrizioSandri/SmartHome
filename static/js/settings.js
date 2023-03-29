@@ -24,6 +24,7 @@ function load_settings(data) {
     let cam = 1;
     for(const key in data["surveillance"]){
         document.getElementById(`cam${cam}_name`).innerHTML = key;
+        document.getElementById(`cam${cam}_name_hidden`).value = key;
         document.getElementById(`cam${cam}_ip`).value = data["surveillance"][key]["ip"];
         document.getElementById(`cam${cam}_rtsp_port`).value = data["surveillance"][key]["rtsp_port"];
         document.getElementById(`cam${cam}_username`).value = data["surveillance"][key]["username"];

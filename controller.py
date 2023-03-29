@@ -608,13 +608,13 @@ def settings_save():
 
 
         for cam in range(1,len(envData["surveillance"])+1):
-            cam_name = list(envData["surveillance"].keys())[cam-1]
+            cam_name = request.form.get("cam%d_name_hidden" % cam, default=None)
             envData["surveillance"][cam_name]["ip"] = request.form.get("cam%d_ip" % cam, default=envData["surveillance"][cam_name]["ip"])
             envData["surveillance"][cam_name]["rtsp_port"] = request.form.get("cam%d_rtsp_port" % cam, default=envData["surveillance"][cam_name]["rtsp_port"])
             envData["surveillance"][cam_name]["username"] = request.form.get("cam%d_username" % cam, default=envData["surveillance"][cam_name]["username"])
             envData["surveillance"][cam_name]["password"] = envData["surveillance"][cam_name]["password"] if len(request.form.get("cam%d_password" % cam)) == 0 else request.form.get("cam%d_password" % cam, default=envData["surveillance"][cam_name]["password"])
             envData["surveillance"][cam_name]["stream"] = request.form.get("cam%d_stream" % cam, default=envData["surveillance"][cam_name]["stream"])
-        
+            
         envData["interface_password"] = interface_password
         envData["vars"]["house_name"] = house_name
         envData["vars"]["weather_location"] = weather_location
