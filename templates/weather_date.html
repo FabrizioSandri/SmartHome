@@ -16,6 +16,14 @@
         
         <script>
             
+            function displayError(error_msg){
+                if (error_msg && error_msg.length != 0){
+                    let modal = document.getElementById("errormodal");
+                    $('#errormodal').modal('show');
+                    document.getElementById("error_res").innerText = error_msg;
+                }
+            }
+
             function generateDownloadHistoryOptions(){
                 var optionMese = document.getElementById("mese");
                 var optionAnno = document.getElementById("anno");
@@ -669,10 +677,34 @@
             </div>
         </div>
 
+
+        <!-- Modal -->
+        <div class="modal fade" id="errormodal" role="dialog" aria-modal="true" aria-labelledby="errormodalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                <div class="modal-body">
+                    <p id="error_res"></p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        
+
         <script>
+
+            displayError("{{ error }}");
             getForecast();
             generateDownloadHistoryOptions();
             setInterval(getForecast, 2000);
+            
 
             var screen_width = $(window).width();
 
@@ -707,6 +739,7 @@
                 document.getElementById("outHumidity").setAttribute("data-width", gauge_size);
                 document.getElementById("outHumidity").setAttribute("data-height", gauge_size);
             }
+
         </script>
 
     </body>

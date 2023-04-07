@@ -16,9 +16,7 @@ from Utilities import Utilities
 import json
 import os
 
-'''
-Env variables
-'''
+# Env variables
 envFile = open("./ENV.json", "r", encoding='utf-8')
 envData = json.load(envFile)
 envFile.close()
@@ -28,7 +26,7 @@ app.secret_key = envData['session_secret_key']
 app.config['SESSION_TYPE'] = 'filesystem'
 
 
-# set permanent session
+# Configure permanent session
 @app.before_request
 def make_session_permanent():
     session.permanent = True
@@ -36,9 +34,7 @@ def make_session_permanent():
 @app.route('/', methods = ['GET'])
 def index():
     if session.get("authenticated") :
-
         return render_template("index.html", vars=envData["vars"])
-
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
 
@@ -61,7 +57,6 @@ def login():
 #################### WEATHER ####################
 @app.route('/weather', methods = ['GET', 'POST'])
 def weather():
-
     if session.get("authenticated") :
 
         if request.method == 'POST' :
@@ -71,17 +66,16 @@ def weather():
         elif request.method == 'GET':
             date = request.args.get("date", None, None)
             precision = request.args.get("precision", None, None)
-
         else:
             return "Method not supported"
 
-        # args check
+        # Sanity check for the date 
         if not date:
             return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"]) 
 
         gap = envData["weather"]["default_chart_gap"]
         if precision:
-            gap = int(int(precision)/2) # data is retrieved every 2 seconds
+            gap = int(int(precision)/2) # one data point is retrieved once every 2 seconds
             gap = 1 if gap < 1 else gap
 
         try:
@@ -92,10 +86,8 @@ def weather():
             statistics = weatherDataManager.getStatistic(properties)
 
             return render_template("weather.html", chartData=chartData, date=date, statistics=statistics, vars=envData["vars"])
-
-        except Exception as e: ## selected a date without data
-            print(e)
-            return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"])         
+        except Exception as e: # The user elected a date without existing data
+            return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"], error="Nessun dato trovato per il giorno selezionato.")         
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
