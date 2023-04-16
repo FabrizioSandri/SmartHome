@@ -248,17 +248,21 @@ class BuderusDataManager:
         year = parsedDate.strftime("%Y")
         fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
 
-        dataframe = pd.read_csv(fileLocation)
+        if os.path.isfile(fileLocation):
 
-        days = dataframe.iloc[:,0].values
-        measure = dataframe.iloc[:,1].values
-        
-        consumedEnergy = {
-            "days" : days.tolist(),
-            "measure" : measure.tolist()
-        }
+            dataframe = pd.read_csv(fileLocation)
 
-        return json.dumps(consumedEnergy)
+            days = dataframe.iloc[:,0].values
+            measure = dataframe.iloc[:,1].values
+            
+            consumedEnergy = {
+                "days" : days.tolist(),
+                "measure" : measure.tolist()
+            }
+
+            return json.dumps(consumedEnergy)
+
+        return 0
 
     '''
     ottiene dati generali sull'impianto

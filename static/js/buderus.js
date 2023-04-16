@@ -423,6 +423,12 @@ function getConsumedEnergyMonthly() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
+            if (this.responseText == "0"){
+                let modal = document.getElementById("errormodal");
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = "Nessun dato trovato per il mese selezionato.";
+                return;
+            }
 
             let consumedEnergy = JSON.parse(this.responseText)
             
