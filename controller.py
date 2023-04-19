@@ -487,13 +487,10 @@ def buderusTesting():
 
 def gen_frames(videoCaptureSource):  
     while True:
-        success, frame = videoCaptureSource.getFrame()  # read the videoCaptureSource frame
-        if not success:
-            break
-        else:
-            frame = frame.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
+        frame = videoCaptureSource.getFrame()  # read the videoCaptureSource frame
+        frame = frame.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n') 
 
 
 @app.route('/surveillance', methods = ['GET'])
