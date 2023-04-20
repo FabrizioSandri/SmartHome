@@ -61,7 +61,7 @@ class BuderusDataManager:
             'Connection': 'Close'
         }
         
-        requestUrl = self.gateway_ip + requestUrl
+        requestUrl = "http://" + self.gateway_ip + requestUrl
 
         # decodifica della risposta
         encryptedResponse = requests.get(requestUrl, headers=headers, verify=False)
@@ -211,6 +211,15 @@ class BuderusDataManager:
 
         return json.dumps(consumedEnergy)
 
+    def getMonthlyConsumedEnergyFile(self, date):
+        parsedDate = datetime.strptime(date, "%Y-%m")
+
+        month = parsedDate.strftime("%m")
+        year = parsedDate.strftime("%Y")
+        fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
+
+        return (fileLocation)
+
     '''
     salva i dati mensili della pompa di calore
     '''
@@ -239,22 +248,26 @@ class BuderusDataManager:
         year = parsedDate.strftime("%Y")
         fileLocation = os.path.join(self.historical_data_location, f"{year}{month}_buderus.csv")
 
-        dataframe = pd.read_csv(fileLocation)
+        if os.path.isfile(fileLocation):
 
-        days = dataframe.iloc[:,0].values
-        measure = dataframe.iloc[:,1].values
-        
-        consumedEnergy = {
-            "days" : days.tolist(),
-            "measure" : measure.tolist()
-        }
+            dataframe = pd.read_csv(fileLocation)
 
-        return json.dumps(consumedEnergy)
+            days = dataframe.iloc[:,0].values
+            measure = dataframe.iloc[:,1].values
+            
+            consumedEnergy = {
+                "days" : days.tolist(),
+                "measure" : measure.tolist()
+            }
+
+            return json.dumps(consumedEnergy)
+
+        return 0
 
     '''
     ottiene dati generali sull'impianto
     '''
-    def getHeaderData(self):
+    def getGeneralData(self):
         heatingCircuitsNum = 4
 
         requestUrl = f"/dhwCircuits/dhw1/currentSetpoint" 

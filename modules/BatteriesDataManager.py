@@ -70,7 +70,7 @@ class BatteriesDataManager:
     gets Tesla gateway auth-token
     '''
     def getAuthCookie(self):
-        requestUrl = self.gateway_ip + "/api/login/Basic"
+        requestUrl = "https://" + self.gateway_ip + "/api/login/Basic"
         params = {
             "username":"customer",
             "password": self.gateway_password,
@@ -88,7 +88,7 @@ class BatteriesDataManager:
     gets Tesla battery percentage
     '''
     def getBatteryPercentage(self):
-        requestUrl = self.gateway_ip + "/api/system_status/soe"
+        requestUrl = "https://" + self.gateway_ip + "/api/system_status/soe"
 
         jsonResponse = self.teslaRequest(requestUrl)
         
@@ -107,7 +107,7 @@ class BatteriesDataManager:
         solar
     '''
     def getAggregatesData(self):
-        requestUrl = self.gateway_ip + "/api/meters/aggregates"
+        requestUrl = "https://" + self.gateway_ip + "/api/meters/aggregates"
 
         jsonResponse = self.teslaRequest(requestUrl)
 
@@ -122,7 +122,7 @@ class BatteriesDataManager:
     gets Tesla system version
     '''
     def getVersion(self):
-        requestUrl = self.gateway_ip + "/api/status"
+        requestUrl = "https://" + self.gateway_ip + "/api/status"
 
         jsonResponse = self.teslaRequest(requestUrl)
 

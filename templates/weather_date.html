@@ -16,6 +16,44 @@
         
         <script>
             
+            function displayError(error_msg){
+                if (error_msg && error_msg.length != 0){
+                    let modal = document.getElementById("errormodal");
+                    $('#errormodal').modal('show');
+                    document.getElementById("error_res").innerText = error_msg;
+                }
+            }
+
+            function generateDownloadHistoryOptions(){
+                var optionMese = document.getElementById("mese");
+                var optionAnno = document.getElementById("anno");
+
+                var currentYear = new Date().getFullYear();
+                var startYear = 2021; // dati dal 2021 in poi
+
+                var years = [];
+                var months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+                while (startYear <= currentYear){
+                    years.push(startYear++);
+                }
+
+                years.forEach((year) => {
+                    let optionYear = document.createElement("option");
+                    optionYear.setAttribute("value", "" + year);
+                    optionYear.innerText = year;
+
+                    optionAnno.appendChild(optionYear);
+                });
+
+                months.forEach((month) => {
+                    let optionMonth = document.createElement("option");
+                    optionMonth.setAttribute("value", "" + month);
+                    optionMonth.innerText = month;
+
+                    optionMese.appendChild(optionMonth);
+                });
+            }
 
             // get forecast for today
             function getForecast() {
@@ -49,6 +87,28 @@
                         let dayRain = parseFloat(result["dayRain"]).toFixed(1);
                         let monthRain = parseFloat(result["monthRain"]).toFixed(1);
                         let yearRain = parseFloat(result["yearRain"]).toFixed(1);
+
+
+                        // handle rain overflows
+                        if (dayRain >= 1){
+                            let maxRain = Math.ceil(dayRain);
+                            document.getElementById("dayRain").setAttribute("data-max-value", maxRain);    
+                            let evenlySpaced = [];
+                            for (let i = 0; i <= 10; i++) {
+                                evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
+                            }
+                            document.getElementById("dayRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
+                        }
+
+                        if (monthRain >= 10){
+                            let maxRain = Math.ceil(monthRain / 10) * 10;
+                            document.getElementById("monthRain").setAttribute("data-max-value", maxRain);    
+                            let evenlySpaced = [];
+                            for (let i = 0; i <= 10; i++) {
+                                evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
+                            }
+                            document.getElementById("monthRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
+                        }
 
                         document.getElementById("forecasticon").setAttribute("src", "/static/weathericons/" + forecast_icon);
                         document.getElementById("forecastrule").innerText = forecast_rule;
@@ -530,16 +590,25 @@
             <div class="row border-top pt-2 p-3">
                 <div class="rightmargin col-sm-6">
                     <h5>Previsione</h5>
-                    <div class="row justify-content-center">
-                        <img id="forecasticon" src="/static/weathericons/clear-day.svg" alt="-">
-                        <p id="forecastrule"></p>
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col-sm-3">
+                            <img id="forecasticon" src="/static/weathericons/clear-day.svg" alt="-">
+                        </div>
+                        <div class="col-sm-9" id="forecastrule">
+
+                        </div>
+                        
                     </div>
                     
                 </div>
                 <div class="col-sm-6">
                     <h5>Alba e tramonto</h5>
-                    <p>Alba: <span id="sunrise">-</span></p>
-                    <p>Tramonto: <span id="sunset">-</span></p>
+                    <div class="row justify-content-center align-items-center">
+                        Alba: <span id="sunrise">-</span>
+                    </div>
+                    <div class="row justify-content-center align-items-center">
+                        Tramonto: <span id="sunset">-</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -550,7 +619,7 @@
                 <div class="col-sm-6 pl-3 rightmargin">
                     <h2>Dati giornalieri</h2>
                     <p>
-                        Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 20 secondi)
+                        Visualizza i grafici giornalieri per una data giornata, specificando la precisione dei grafici(default 500 secondi)
                     </p>
 
                     <form method="POST" action="/weather">
@@ -578,6 +647,21 @@
                             </div>
                         </div>
                     </form>
+
+                    <hr />
+
+                    <h2>Scarica i dati mensili</h2>
+                    <p>
+                        Scarica i dati di un mese specifico. Nota che ci vorrà quale minuto per generare il file CSV.
+                    </p>
+
+                    <form method="GET" action="/weather/historicalMonth">
+                        
+                        <select id="mese" name="mese"></select>
+                        <select id="anno" name="anno"></select>
+                        <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+
+                    </form>
                     
                 </div>
                 <div class="col-sm-6">
@@ -593,9 +677,34 @@
             </div>
         </div>
 
+
+        <!-- Modal -->
+        <div class="modal fade" id="errormodal" role="dialog" aria-modal="true" aria-labelledby="errormodalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                <div class="modal-body">
+                    <p id="error_res"></p>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        
+
         <script>
+
+            displayError("{{ error }}");
             getForecast();
+            generateDownloadHistoryOptions();
             setInterval(getForecast, 2000);
+            
 
             var screen_width = $(window).width();
 
@@ -630,6 +739,7 @@
                 document.getElementById("outHumidity").setAttribute("data-width", gauge_size);
                 document.getElementById("outHumidity").setAttribute("data-height", gauge_size);
             }
+
         </script>
 
     </body>

@@ -18,7 +18,6 @@ class WeatherDataManager:
 
         csv_location = f"{data_path}/{self.historical_prefix}-{year}-{month}-{day}.csv"
 
-        # error_bad_lines=False  removes lines with more columns than specified
         self.dataset = pd.read_csv(csv_location, na_values=['None'])
         self.dataset = self.dataset.fillna(0.0)
         self.dataset = self.dataset.round(3)
@@ -116,8 +115,8 @@ class WeatherDataManager:
         gap = int(int(precision)/2)
         gap = 1 if gap < 1 else gap
 
-        # error_bad_lines=False  removes lines with more columns than specified
-        dataset = pd.read_csv(fileLocation, na_values=['None'], error_bad_lines=False)
+        # on_bad_lines='skip' removes lines with more columns than specified
+        dataset = pd.read_csv(fileLocation, na_values=['None'], on_bad_lines='skip')
         dataset = dataset.fillna(0.0)
         dataset = dataset.round(3)
 
@@ -129,16 +128,13 @@ class WeatherDataManager:
 
 
     @staticmethod
-    def getMonthFitleredHisoricalFile(hisotricalDataLocation, historical_prefix, year, month, precision):
+    def getMonthHisoricalFile(hisotricalDataLocation, historical_prefix, year, month,):
         
         outFileName = f"/tmp/{historical_prefix}-{year}-{month}.csv"
 
-        print(outFileName)
-
-        # / 2 in quanto ogni riga è presa ogni 2 secondi
-        gap = int(int(precision)/2)
-        gap = 1 if gap < 1 else gap
-
+        if os.path.isfile(outFileName):
+            return (outFileName)
+            
         monthDatasets = []
         
         for day in range(1, 32):
@@ -151,11 +147,8 @@ class WeatherDataManager:
 
             # se il file esiste
             if os.path.isfile(fileLocation):
-                temp_dataset = pd.read_csv(fileLocation, na_values=['None'], error_bad_lines=False)
-                temp_dataset = temp_dataset.fillna(0.0)
+                temp_dataset = pd.read_csv(fileLocation, na_values=['None'], on_bad_lines='skip')
                 temp_dataset = temp_dataset.round(3)
-
-                temp_dataset = temp_dataset.iloc[::gap]
 
                 temp_dataset['dateTime'] = pd.to_datetime(temp_dataset['dateTime'], unit='s')
                 temp_dataset['dateTime'] = temp_dataset['dateTime'].dt.tz_localize('UTC').dt.tz_convert('Europe/Rome')
