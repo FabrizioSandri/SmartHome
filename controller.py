@@ -505,21 +505,15 @@ def surveillance():
 
 @app.route('/surveillance/video_feed', methods = ['GET'])
 def video_feed():
-    if session.get("authenticated") :
+    cameraid = request.args.get("cameraid", None, None)
+    numCameras = request.args.get("numCameras", None, None) # in order to resize the image
 
-        cameraid = request.args.get("cameraid", None, None)
-        numCameras = request.args.get("numCameras", None, None) # in order to resize the image
+    cameraData = envData["surveillance"][cameraid]
+    
+    rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
+    camera = Camera(rtspStream, numCameras)
 
-        cameraData = envData["surveillance"][cameraid]
-        
-        rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
-        camera = Camera(rtspStream, numCameras)
-
-        return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-        
-    else: # need to authenticate
-        return render_template("login.html")
+    return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 #################### SETTINGS ####################
 @app.route('/settings', methods = ['GET'])
