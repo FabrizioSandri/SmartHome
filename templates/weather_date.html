@@ -110,6 +110,16 @@
                             document.getElementById("monthRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
                         }
 
+                        if (yearRain >= 100){
+                            let maxRain = Math.ceil(yearRain / 100) * 100;
+                            document.getElementById("yearRain").setAttribute("data-max-value", maxRain);    
+                            let evenlySpaced = [];
+                            for (let i = 0; i <= 10; i++) {
+                                evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
+                            }
+                            document.getElementById("yearRain").setAttribute("data-major-ticks", evenlySpaced.join(", "));    
+                        }
+
                         document.getElementById("forecasticon").setAttribute("src", "/static/weathericons/" + forecast_icon);
                         document.getElementById("forecastrule").innerText = forecast_rule;
                         document.getElementById("outTemp").setAttribute("data-value", outTemp);
