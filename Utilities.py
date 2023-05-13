@@ -1,3 +1,4 @@
+import glob
 
 class Utilities:
 
@@ -25,4 +26,12 @@ class Utilities:
                 dateStr[:4].isdigit()   and \
                 dateStr[4] == "-"       and \
                 dateStr[5:7].isdigit() 
-            
+    
+    @staticmethod
+    def getLastFileOfMonth(path, month, year):
+        filteredFiles = glob.glob(f"{path}-{year}-{month}-*.csv")
+        if filteredFiles is None or len(filteredFiles) == 0:
+            return None
+
+        filteredFiles.sort(reverse=True)
+        return filteredFiles[0]
