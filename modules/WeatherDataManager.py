@@ -168,18 +168,11 @@ class WeatherDataManager:
             
 
     @staticmethod
-    def getForecast(hisotricalDataLocation, historical_prefix):
+    def getForecast(fileLocation):
         
         forecastFile = open("./static/forecast.json", "r")
         forecast = json.load(forecastFile)
         forecastFile.close()
-
-
-        nowDate = datetime.now() 
-        yearMonthDay = nowDate.strftime("%Y-%m-%d")
-
-        filename = f"{historical_prefix}-{yearMonthDay}.csv"
-        fileLocation = os.path.join(hisotricalDataLocation, filename)
 
         today_data = open(fileLocation, 'r')
         lines = today_data.readlines()

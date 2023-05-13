@@ -27,6 +27,7 @@
             function generateDownloadHistoryOptions(){
                 var optionMese = document.getElementById("mese");
                 var optionAnno = document.getElementById("anno");
+                var optionYearRain = document.getElementById("rainyear");
 
                 var currentYear = new Date().getFullYear();
                 var startYear = 2021; // dati dal 2021 in poi
@@ -42,8 +43,21 @@
                     let optionYear = document.createElement("option");
                     optionYear.setAttribute("value", "" + year);
                     optionYear.innerText = year;
+                    if(year == currentYear){
+                        optionYear.setAttribute("selected", "selected")
+                    }
 
                     optionAnno.appendChild(optionYear);
+                });
+
+                years.forEach((year) => {
+                    let optionYear = document.createElement("option");
+                    optionYear.setAttribute("value", "" + year);
+                    optionYear.innerText = year;
+                    if(year == currentYear){
+                        optionYear.setAttribute("selected", "selected")
+                    }
+                    optionYearRain.appendChild(optionYear);
                 });
 
                 months.forEach((month) => {
@@ -53,6 +67,78 @@
 
                     optionMese.appendChild(optionMonth);
                 });
+            }
+
+            function createMonthRainMeter() {
+                let months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre ", "dicembre"];
+                let rain_meter_container = document.getElementById("rain_meter_container");
+                rain_meter_container.innerHTML = '';
+                
+                let selected_year = document.getElementById("rainyear").value
+
+                for (let i=0; i<12; i++) {
+                    let label = months[i];
+                    let id = months[i] + "_totalrain"
+                    
+                    // prepare the canvas 
+                    
+                    let canvas = document.createElement("canvas");
+
+                    canvas.setAttribute("id", id);
+                    canvas.setAttribute("data-type", "linear-gauge");
+                    canvas.setAttribute("data-value", "0");
+                    canvas.setAttribute("data-title", label);
+                    canvas.setAttribute("data-units", "cm");
+                    canvas.setAttribute("data-width", "80");
+                    canvas.setAttribute("data-height", "300");
+                    canvas.setAttribute("data-min-value", "0");
+                    canvas.setAttribute("data-max-value", "10");
+                    canvas.setAttribute("data-major-ticks", "0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10");
+                    canvas.setAttribute("data-minor-ticks", "5");
+                    canvas.setAttribute("data-stroke-ticks", "true");
+                    canvas.setAttribute("data-border-shadow-width", "0");
+                    canvas.setAttribute("data-borders", "false");
+                    canvas.setAttribute("data-bar-begin-circle", "false");
+                    canvas.setAttribute("data-tick-side", "left");
+                    canvas.setAttribute("data-number-side", "left");
+                    canvas.setAttribute("data-needle-side", "left");
+                    canvas.setAttribute("data-needle-type", "line");
+                    canvas.setAttribute("data-needle-width", "3");
+                    canvas.setAttribute("data-color-needle", "rgba(255, 50, 50, 0.9)");
+                    canvas.setAttribute("data-color-needle-end", "rgba(255, 50, 50, 0.9)");
+                    canvas.setAttribute("data-color-needle-shadow-up", "rgba(255, 50, 50, 0)");
+                    canvas.setAttribute("data-color-needle-shadow-down", "rgba(255, 50, 50, 0)");
+                    canvas.setAttribute("data-needle-end", "150");
+                    canvas.setAttribute("data-color-bar-progress", "#327ac0");
+
+                    canvas.setAttribute("data-highlights", "[]");
+                    canvas.setAttribute("data-value-dec", "1");
+                    canvas.setAttribute("data-value-int", "0");
+                    canvas.setAttribute("data-value-box-stroke", "1");
+                    canvas.setAttribute("data-value-text-shadow", "0");
+                    canvas.setAttribute("data-font-value-size", "40");
+                    canvas.setAttribute("data-color-value-box-shadow", "0");
+                    canvas.setAttribute("data-color-value-box-background", "rgba(226, 226, 226, 0.3)");
+
+                    canvas.setAttribute("data-font-units-weight", "bolder");
+                    canvas.setAttribute("data-font-title-weight", "bolder");
+                    canvas.setAttribute("data-font-value-weight", "bold");
+                    canvas.setAttribute("data-font-numbers-weight", "bold");
+                    canvas.setAttribute("data-font-numbers-size", "30");
+                    canvas.setAttribute("data-font-title-size", "40");
+                    canvas.setAttribute("data-font-units-size", "40");
+
+                    canvas.setAttribute("data-bar-width", "30");
+                    canvas.setAttribute("data-ticks-width", "40");
+                    canvas.setAttribute("data-ticks-width-minor", "15");
+
+                    rain_meter_container.appendChild(canvas);
+                    
+                    getMonthRain(selected_year, i+1, months[i] + "_totalrain");
+
+
+                }
+                
             }
 
             // get forecast for today
@@ -152,6 +238,31 @@
                 }
 
                 xhttp.open("GET", "weather/getForecast", true);
+                xhttp.send();
+            }
+
+            function getMonthRain(year, month, meterId){
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200){
+                        
+                        let monthRain = this.responseText;
+
+                        if (monthRain >= 10){
+                            let maxRain = Math.ceil(monthRain / 10) * 10;
+                            document.getElementById(meterId).setAttribute("data-max-value", maxRain);    
+                            let evenlySpaced = [];
+                            for (let i = 0; i <= 10; i++) {
+                                evenlySpaced.push(Math.round(i * 0.1 * maxRain * 100) / 100);
+                            }
+                            document.getElementById(meterId).setAttribute("data-major-ticks", evenlySpaced.join(", "));    
+                        }
+
+                        document.getElementById(meterId).setAttribute("data-value", this.responseText)
+                    }
+                }
+
+                xhttp.open("GET", "weather/getMonthRain?mese=" + month + "&anno="+year, true);
                 xhttp.send();
             }
         </script>
@@ -515,6 +626,7 @@
                                 data-needle-end="150"
                                 data-color-bar-progress="#327ac0"
                                 
+                                data-highlights='[]'
                                 data-value-dec="1"
                                 data-value-int="0"
                                 data-value-box-stroke="1"
@@ -688,6 +800,22 @@
         </div>
 
 
+        <div class="container maincontainer">
+            <div class="row">
+                <div class="col">
+                    <h2>Precipitazioni annuali</h2>
+                    <select id="rainyear" name="rainyear" onchange="createMonthRainMeter()"></select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col linear" id="rain_meter_container">
+                    
+                </div>
+            </div>
+        </div>
+
+
         <!-- Modal -->
         <div class="modal fade" id="errormodal" role="dialog" aria-modal="true" aria-labelledby="errormodalTitle" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -749,6 +877,8 @@
                 document.getElementById("outHumidity").setAttribute("data-width", gauge_size);
                 document.getElementById("outHumidity").setAttribute("data-height", gauge_size);
             }
+
+            createMonthRainMeter();
 
         </script>
 

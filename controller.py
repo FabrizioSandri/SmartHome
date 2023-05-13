@@ -15,6 +15,7 @@ from Utilities import Utilities
 
 import json
 import os
+from datetime import datetime
 
 # Env variables
 envFile = open("./ENV.json", "r", encoding='utf-8')
@@ -150,8 +151,42 @@ def download_monthly_historical_file():
 @app.route('/weather/getForecast', methods = ['GET'])
 def getWeatherForecast():
     if session.get("authenticated") :
+    
+        nowDate = datetime.now() 
+        yearMonthDay = nowDate.strftime("%Y-%m-%d")
+
+        historical_prefix = envData["weather"]["historical_data_prefix"]
+        hisotricalDataLocation = envData["weather"]["historical_data_location"]
+        filename = f"{historical_prefix}-{yearMonthDay}.csv"
+        fileLocation = os.path.join(hisotricalDataLocation, filename)
+        
+        return WeatherDataManager.getForecast(fileLocation)
+
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
+
+# get total month rain
+@app.route('/weather/getMonthRain', methods = ['GET'])
+def getMonthRain():
+    if session.get("authenticated") :
             
-        return WeatherDataManager.getForecast(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"])
+        month = request.args.get("mese", None, None)
+        year = request.args.get("anno", None, None)
+        if int(month) < 10:
+            month = '0' + month
+
+        fileLocationLastOfMonth = Utilities.getLastFileOfMonth(os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}"), month, year)
+        if fileLocationLastOfMonth is not None:
+            historical_prefix = envData["weather"]["historical_data_prefix"]
+            hisotricalDataLocation = envData["weather"]["historical_data_location"]
+            fileLocation = os.path.join(hisotricalDataLocation, fileLocationLastOfMonth)
+
+            forecast = WeatherDataManager.getForecast(fileLocation)
+            jsonParsed = json.loads(forecast)
+            return jsonParsed["monthRain"]
+            
+        else:
+            return "0.0"
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
