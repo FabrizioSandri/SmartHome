@@ -313,7 +313,6 @@ def e4u_data():
         else:
             return jsonify(e4uOnlineData)
 
-
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
 
@@ -425,7 +424,6 @@ def buderusSaveEnergyConsumedMonthly():
         return render_template("login.html", vars=envData["vars"])
 
 
-
 @app.route('/buderus/temperatures', methods = ['GET'])
 def buderusTemperatures():
     if session.get("authenticated") :
@@ -477,7 +475,6 @@ def buderusgetGeneralData():
         return render_template("login.html", vars=envData["vars"])
 
 
-
 @app.route('/buderus/saveGeneralInformation', methods = ['GET'])
 def buderusSaveGeneralInformation():
     if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
@@ -487,6 +484,7 @@ def buderusSaveGeneralInformation():
 
     else: # need to authenticate
         return render_template("login.html")
+
 
 @app.route('/buderus/getGeneralInformation', methods = ['GET'])
 def buderusGetGeneralInformation():
