@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Lock
 import cv2
 import time
 import queue
@@ -7,10 +7,10 @@ class Camera:
 
   def __init__(self, url, numCameras):
     self.cap = cv2.VideoCapture(url)
-    self.q = queue.Queue()
     self.numCameras = numCameras
     self.exit_flag = time.time()
-    
+    self.lock = Lock()
+
     t = Thread(target=self.passiveRead)
     t.daemon = True
     t.start()
@@ -21,22 +21,21 @@ class Camera:
         if time.time() - self.exit_flag > 3: # after 3 seconds of inactivity stop the stream
             self.cap.release()
             break
-        ret, frame = self.cap.read()
-        if not ret:
-            break
-        if not self.q.empty():
-            try:
-                self.q.get_nowait()   # discard previous (unprocessed) frame
-            except queue.Empty:
-                pass
-        self.q.put(frame)
+        self.lock.acquire()
+        self.cap.grab()
+        self.lock.release()
+        time.sleep(0.01)
 
   def getFrame(self):
     self.exit_flag = time.time()
-    frame = self.q.get()
+    
+    self.lock.acquire()
+    ret, frame = self.cap.read()
+    self.lock.release()
+
     # if more than one camera, resize the image
     if int(self.numCameras) > 1:
-        frame = cv.resize(frame,None,fx=0.5,fy=0.5) 
+        frame = cv2.resize(frame,None,fx=0.5,fy=0.5) 
 
     ret, frame = cv2.imencode('.jpg', frame)
     return frame

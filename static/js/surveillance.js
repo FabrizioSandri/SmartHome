@@ -12,6 +12,10 @@ function generateCameraSelector(id, camerasJson) {
     
 }
 
+
+/**
+ * Used to switch from one camera to another
+ */
 function switchCamera(id, numCameras) {
     cameraView = document.getElementById(`camera${id}`);
     newCameraid = document.getElementById(`cameras${id}`).value;

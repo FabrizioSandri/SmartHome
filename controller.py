@@ -15,6 +15,7 @@ from Utilities import Utilities
 
 import json
 import os
+from datetime import datetime
 
 # Env variables
 envFile = open("./ENV.json", "r", encoding='utf-8')
@@ -150,8 +151,42 @@ def download_monthly_historical_file():
 @app.route('/weather/getForecast', methods = ['GET'])
 def getWeatherForecast():
     if session.get("authenticated") :
+    
+        nowDate = datetime.now() 
+        yearMonthDay = nowDate.strftime("%Y-%m-%d")
+
+        historical_prefix = envData["weather"]["historical_data_prefix"]
+        hisotricalDataLocation = envData["weather"]["historical_data_location"]
+        filename = f"{historical_prefix}-{yearMonthDay}.csv"
+        fileLocation = os.path.join(hisotricalDataLocation, filename)
+        
+        return WeatherDataManager.getForecast(fileLocation)
+
+    else: # need to authenticate
+        return render_template("login.html", vars=envData["vars"])
+
+# get total month rain
+@app.route('/weather/getMonthRain', methods = ['GET'])
+def getMonthRain():
+    if session.get("authenticated") :
             
-        return WeatherDataManager.getForecast(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"])
+        month = request.args.get("mese", None, None)
+        year = request.args.get("anno", None, None)
+        if int(month) < 10:
+            month = '0' + month
+
+        fileLocationLastOfMonth = Utilities.getLastFileOfMonth(os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}"), month, year)
+        if fileLocationLastOfMonth is not None:
+            historical_prefix = envData["weather"]["historical_data_prefix"]
+            hisotricalDataLocation = envData["weather"]["historical_data_location"]
+            fileLocation = os.path.join(hisotricalDataLocation, fileLocationLastOfMonth)
+
+            forecast = WeatherDataManager.getForecast(fileLocation)
+            jsonParsed = json.loads(forecast)
+            return jsonParsed["monthRain"]
+            
+        else:
+            return "0.0"
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
@@ -278,7 +313,6 @@ def e4u_data():
         else:
             return jsonify(e4uOnlineData)
 
-
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
 
@@ -390,7 +424,6 @@ def buderusSaveEnergyConsumedMonthly():
         return render_template("login.html", vars=envData["vars"])
 
 
-
 @app.route('/buderus/temperatures', methods = ['GET'])
 def buderusTemperatures():
     if session.get("authenticated") :
@@ -442,7 +475,6 @@ def buderusgetGeneralData():
         return render_template("login.html", vars=envData["vars"])
 
 
-
 @app.route('/buderus/saveGeneralInformation', methods = ['GET'])
 def buderusSaveGeneralInformation():
     if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
@@ -452,6 +484,7 @@ def buderusSaveGeneralInformation():
 
     else: # need to authenticate
         return render_template("login.html")
+
 
 @app.route('/buderus/getGeneralInformation', methods = ['GET'])
 def buderusGetGeneralInformation():
@@ -505,21 +538,15 @@ def surveillance():
 
 @app.route('/surveillance/video_feed', methods = ['GET'])
 def video_feed():
-    if session.get("authenticated") :
+    cameraid = request.args.get("cameraid", None, None)
+    numCameras = request.args.get("numCameras", None, None) # in order to resize the image
 
-        cameraid = request.args.get("cameraid", None, None)
-        numCameras = request.args.get("numCameras", None, None) # in order to resize the image
+    cameraData = envData["surveillance"][cameraid]
+    
+    rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
+    camera = Camera(rtspStream, numCameras)
 
-        cameraData = envData["surveillance"][cameraid]
-        
-        rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
-        camera = Camera(rtspStream, numCameras)
-
-        return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-        
-    else: # need to authenticate
-        return render_template("login.html")
+    return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 #################### SETTINGS ####################
 @app.route('/settings', methods = ['GET'])
