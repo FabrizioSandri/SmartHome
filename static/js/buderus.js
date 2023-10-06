@@ -53,7 +53,11 @@ function getConsumedEnergyDaily() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
-            
+            if (this.responseText.toString() == "-1"){
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = "Errore di rete.";
+                return;
+            }
             let consumedEnergy = JSON.parse(this.responseText)
 
             // total daily consumed energy
@@ -71,6 +75,12 @@ function getConsumedEnergyDaily() {
             var xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200){
+
+                    if (this.responseText.toString() == "-1"){
+                        $('#errormodal').modal('show');
+                        document.getElementById("error_res").innerText = "Errore di rete.";
+                        return;
+                    }
 
                     let generalInformation = JSON.parse(this.responseText)
                     let avgGeneralInformation = getAverages(generalInformation, date)
@@ -236,6 +246,12 @@ function getTemperatures() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
+            
+            if (this.responseText.toString() == "-1"){
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = "Errore di rete.";
+                return;
+            }
 
             let temperatures = trimTemperaturesNonZero(JSON.parse(this.responseText));
 
@@ -423,8 +439,7 @@ function getConsumedEnergyMonthly() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
-            if (this.responseText == "0"){
-                let modal = document.getElementById("errormodal");
+            if (this.responseText.toString() == "0" || this.responseText.toString() == "-1"){
                 $('#errormodal').modal('show');
                 document.getElementById("error_res").innerText = "Nessun dato trovato per il mese selezionato.";
                 return;
@@ -555,7 +570,11 @@ function getHeaderData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200){
-
+            if (this.responseText.toString() == "-1"){
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = "Nessun dato trovato per il mese selezionato.";
+                return;
+            }
             let data = JSON.parse(this.responseText)
             
             document.getElementById("temperaturaEsterna").innerText = data["temperaturaEsterna"] + " °C";

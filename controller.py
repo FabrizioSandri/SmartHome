@@ -368,7 +368,11 @@ def buderusGetDaillyConsumedEnergy():
             return "Data errata"
 
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        return jsonify(buderusDataManager.getDaillyConsumedEnergy(date))
+        response = buderusDataManager.getDaillyConsumedEnergy(date)
+        if response == -1:
+            return response
+
+        return jsonify(response)
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
@@ -401,7 +405,6 @@ def buderusEnergyConsumedMonthly():
             return "Data errata"
 
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-
         return str(buderusDataManager.getMonthlyConsumedEnergyFromFile(date))
 
     else: # need to authenticate
@@ -417,7 +420,7 @@ def buderusSaveEnergyConsumedMonthly():
         if Utilities.checkDateNoDay(date) == False: # controllo validita data
             return "Data errata"
 
-        buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
+        buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])       
         return buderusDataManager.saveMonthlyConsumedEnergy(date)
 
     else: # need to authenticate
@@ -434,7 +437,6 @@ def buderusTemperatures():
             return "Data errata"
 
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        
         return str(buderusDataManager.getHeatingCircuitsTemperature(date))
 
     else: # need to authenticate
@@ -467,9 +469,7 @@ def buderusgetGeneralData():
     if session.get("authenticated") :
             
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        data = buderusDataManager.getGeneralData()
-
-        return data
+        return buderusDataManager.getGeneralData()
 
     else: # need to authenticate
         return render_template("login.html", vars=envData["vars"])
@@ -495,7 +495,11 @@ def buderusGetGeneralInformation():
             return "Data errata"
 
         buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        return jsonify(buderusDataManager.getGeneralInformation(date))
+        response = buderusDataManager.getGeneralInformation(date)
+        if response == -1:
+            return -1
+            
+        return jsonify(response)
 
     else: # need to authenticate
         return render_template("login.html")

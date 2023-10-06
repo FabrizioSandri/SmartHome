@@ -64,9 +64,12 @@ class BuderusDataManager:
         requestUrl = "http://" + self.gateway_ip + requestUrl
 
         # decodifica della risposta
-        encryptedResponse = requests.get(requestUrl, headers=headers, verify=False)
-        decryptedResponse = self.decrypt(encryptedResponse.text)
-        
+        try:
+            encryptedResponse = requests.get(requestUrl, headers=headers, verify=False)
+            decryptedResponse = self.decrypt(encryptedResponse.text)
+        except requests.exceptions.RequestException as e:  
+            decryptedResponse = '{}'
+
         jsonResponse = json.loads(decryptedResponse)
         
         return jsonResponse
@@ -91,7 +94,9 @@ class BuderusDataManager:
 
             requestUrl = f"/recordings/heatingCircuits/hc{hc}/roomtemperature?interval={date}" 
             recordings = self.buderusRequest(requestUrl)["recording"]
-            
+            if (recordings == -1):  # Error handling
+                return -1
+
             for hour in range(0, 24):
                 value = recordings[hour]["y"]
                 c = recordings[hour]["c"]
@@ -108,7 +113,9 @@ class BuderusDataManager:
 
         requestUrl = f"/recordings/dhwCircuits/dhw1/actualTemp?interval={date}" 
         recordings = self.buderusRequest(requestUrl)["recording"]
-        
+        if (recordings == -1):  # Error handling
+            return -1
+
         for hour in range(0, 24):
             value = recordings[hour]["y"]
             c = recordings[hour]["c"]
@@ -160,6 +167,9 @@ class BuderusDataManager:
         requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
 
         recordings = self.buderusRequest(requestUrl)["recording"]
+        if (recordings == -1):  # Error handling
+            return -1
+        
         hours = []
         measure = []
         for hour in range(0, 24):
@@ -190,6 +200,9 @@ class BuderusDataManager:
         requestUrl = "/recordings/heatSources/total/energyMonitoring/consumedEnergy?interval=" + date
 
         recordings = self.buderusRequest(requestUrl)["recording"]
+        if (recordings == -1):  # Error handling
+            return -1
+        
         days = []
         measure = []
         for day in range(0, len(recordings)): # Nota: day parte da 0
@@ -271,20 +284,38 @@ class BuderusDataManager:
         heatingCircuitsNum = 4
 
         requestUrl = f"/dhwCircuits/dhw1/currentSetpoint" 
-        setpointAttuale = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        setpointAttuale = response["value"]
 
         requestUrl = f"/dhwCircuits/dhw1/actualTemp" 
-        temperaturaAttuale = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        temperaturaAttuale = response["value"]
 
         requestUrl = f"/system/sensors/temperatures/outdoor_t1" 
-        temperaturaEsterna = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        temperaturaEsterna = response["value"]
 
         requestUrl = f"/heatSources/actualModulation" 
-        modulazionePompa = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        modulazionePompa = response["value"]
 
         requestUrl = f"/system/appliance/actualSupplyTemperature" 
-        temperaturaMandata = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        temperaturaMandata = response["value"]
 
+        if setpointAttuale == -1 or temperaturaAttuale == -1 or temperaturaEsterna == -1 or modulazionePompa == -1 or temperaturaMandata == -1:  # Error handling
+            return -1
+        
         temperatureHc = {
             "setPointAmbiente" : [],
             "temperaturaAmbiente" : [],
@@ -293,13 +324,22 @@ class BuderusDataManager:
         
         for hc in range(1, heatingCircuitsNum+1):
             requestUrl = f"/heatingCircuits/hc{hc}/currentRoomSetpoint" 
-            temperatureHc["setPointAmbiente"].append(self.buderusRequest(requestUrl)["value"])
+            response = self.buderusRequest(requestUrl)
+            if response == -1:
+                return -1
+            temperatureHc["setPointAmbiente"].append(response["value"])
 
             requestUrl = f"/heatingCircuits/hc{hc}/roomtemperature" 
-            temperatureHc["temperaturaAmbiente"].append(self.buderusRequest(requestUrl)["value"])
+            response = self.buderusRequest(requestUrl)
+            if response == -1:
+                return -1
+            temperatureHc["temperaturaAmbiente"].append(response["value"])
 
             requestUrl = f"/heatingCircuits/hc{hc}/actualSupplyTemperature" 
-            temperatureHc["temperaturaMandata"].append(self.buderusRequest(requestUrl)["value"])
+            response = self.buderusRequest(requestUrl)
+            if response == -1:
+                return -1
+            temperatureHc["temperaturaMandata"].append(response["value"])
 
 
         # dati finali
@@ -321,10 +361,16 @@ class BuderusDataManager:
     '''
     def saveGeneralInformation(self):
         requestUrl = f"/system/sensors/temperatures/outdoor_t1" 
-        externalTemperature = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        externalTemperature = response["value"]
 
         requestUrl = f"/heatSources/actualModulation" 
-        modulation = self.buderusRequest(requestUrl)["value"]
+        response = self.buderusRequest(requestUrl)
+        if response == -1:
+            return -1
+        modulation = response["value"]
         
         now = datetime.now() 
         date_time = now.strftime("%Y%m%d")
