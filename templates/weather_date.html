@@ -150,6 +150,7 @@
                         
                         let result = JSON.parse(this.responseText);
 
+                        let lastUpdate = result["dateTime"];
                         let forecast_icon = result["forecastIcon"];
                         let forecast_rule = result["forecastRule"];
                         let outTemp = parseFloat(result["outTemp"]).toFixed(1);
@@ -170,6 +171,14 @@
                         let cloudbase = parseInt(result["cloudbase"]);
                         let sunrise = result["sunrise"];
                         let sunset = result["sunset"];
+
+                        let lastUpdateDate = new Date(lastUpdate * 1000);
+                        lastUpdate = lastUpdateDate.toLocaleTimeString("it-IT", {hour: '2-digit', minute:'2-digit', second:'2-digit'})
+                        let sunriseDate = new Date(sunrise * 1000);
+                        sunrise = sunriseDate.toLocaleTimeString("it-IT", {hour: '2-digit', minute:'2-digit'})
+                        let sunsetDate = new Date(sunset * 1000);
+                        sunset = sunsetDate.toLocaleTimeString("it-IT", {hour: '2-digit', minute:'2-digit'})
+
                         let dayRain = parseFloat(result["dayRain"]).toFixed(1);
                         let monthRain = parseFloat(result["monthRain"]).toFixed(1);
                         let yearRain = parseFloat(result["yearRain"]).toFixed(1);
@@ -229,6 +238,7 @@
                         document.getElementById("humIdex").innerText = humIdex;
                         document.getElementById("sunrise").innerText = sunrise;
                         document.getElementById("sunset").innerText = sunset;
+                        document.getElementById("lastupdate").innerText = lastUpdate;
                         document.getElementById("cloudbase").setAttribute("data-value", cloudbase);
                         document.getElementById("dayRain").setAttribute("data-value", dayRain);                        
                         document.getElementById("monthRain").setAttribute("data-value", monthRain);                        
@@ -281,6 +291,7 @@
             <div class="row">
                 <div class="col">
                     <h2>Meteo casa {{ vars["house_name"] }}</h2>
+                    <p>Last update: <span id="lastupdate"></span></p>
                 </div>
             </div>
             
