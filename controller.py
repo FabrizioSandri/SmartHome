@@ -486,9 +486,9 @@ def video_feed():
 
     cameraData = envData["surveillance"][cameraid]
     
-    rtspStream = f"rtsp://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['rtsp_port']}/{cameraData['stream']}"
-    camera = Camera(rtspStream, numCameras)
-
+    httpStream = f"http://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['http_port']}/ipcam/mjpeg{cameraData['stream']}.cgi"
+    camera = Camera(httpStream, numCameras)
+    
     return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 #################### SETTINGS ####################
@@ -566,7 +566,7 @@ def settings_save():
     for cam in range(1,len(envData["surveillance"])+1):
         cam_name = request.form.get("cam%d_name_hidden" % cam, default=None)
         envData["surveillance"][cam_name]["ip"] = request.form.get("cam%d_ip" % cam, default=envData["surveillance"][cam_name]["ip"])
-        envData["surveillance"][cam_name]["rtsp_port"] = request.form.get("cam%d_rtsp_port" % cam, default=envData["surveillance"][cam_name]["rtsp_port"])
+        envData["surveillance"][cam_name]["http_port"] = request.form.get("cam%d_http_port" % cam, default=envData["surveillance"][cam_name]["http_port"])
         envData["surveillance"][cam_name]["username"] = request.form.get("cam%d_username" % cam, default=envData["surveillance"][cam_name]["username"])
         envData["surveillance"][cam_name]["password"] = envData["surveillance"][cam_name]["password"] if len(request.form.get("cam%d_password" % cam)) == 0 else request.form.get("cam%d_password" % cam, default=envData["surveillance"][cam_name]["password"])
         envData["surveillance"][cam_name]["stream"] = request.form.get("cam%d_stream" % cam, default=envData["surveillance"][cam_name]["stream"])
