@@ -10,6 +10,7 @@ from flask import send_from_directory
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
 from modules.BuderusDataManager import BuderusDataManager
+from modules.VoipDataManager import VoipDataManager
 from modules.Camera import Camera
 from Utilities import Utilities
 from functools import wraps
@@ -27,6 +28,7 @@ app = Flask(__name__)
 app.secret_key = envData['session_secret_key']
 app.config['SESSION_TYPE'] = 'filesystem'
 
+voipDataManager = VoipDataManager(envData["router"]["ip"], envData["router"]["username"], envData["router"]["password"])
 
 # Configure permanent session
 @app.before_request
@@ -595,4 +597,17 @@ def settings_save():
     envFile.close()
     
     return "Impostazioni salvate correttamente"
-    
+
+
+#################### VOIP CALL LOG ####################
+
+@app.route('/telephone', methods = ['GET'])
+@requires_auth()
+def router():
+    return render_template("telephone.html", vars=envData["vars"])
+        
+@app.route('/telephone/callsLog', methods = ['GET'])
+@requires_auth()
+def telephoneCallsLog():
+    calls = voipDataManager.get_calls()
+    return jsonify(calls)

@@ -26,7 +26,7 @@ function load_settings(data) {
         document.getElementById(`cam${cam}_name`).innerHTML = key;
         document.getElementById(`cam${cam}_name_hidden`).value = key;
         document.getElementById(`cam${cam}_ip`).value = data["surveillance"][key]["ip"];
-        document.getElementById(`cam${cam}_rtsp_port`).value = data["surveillance"][key]["rtsp_port"];
+        document.getElementById(`cam${cam}_http_port`).value = data["surveillance"][key]["http_port"];
         document.getElementById(`cam${cam}_username`).value = data["surveillance"][key]["username"];
         document.getElementById(`cam${cam}_stream`).value = data["surveillance"][key]["stream"];
         cam++;
