@@ -609,5 +609,11 @@ def router():
 @app.route('/telephone/callsLog', methods = ['GET'])
 @requires_auth()
 def telephoneCallsLog():
-    calls = voipDataManager.get_calls()
+    calls = voipDataManager.get_calls()    
+    calls = sorted(calls, key=lambda x: datetime.strptime(x[0], '%d-%m-%Y %H:%M:%S'), reverse=True)
+    for call in calls:
+        if call[1] == envData["router"]["telephone"]:
+            call[6] = 1
+        else:
+            call[6] = 0
     return jsonify(calls)

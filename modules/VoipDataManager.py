@@ -22,12 +22,6 @@ class VoipDataManager:
         self.aes_key = "1703697166759112"   # Random key
         self.aes_iv = "1703697166759112"    # Random iv
 
-        # Jsessionid
-        self.jsessionid_issue_date = time.time()    # USed to keep track if it's necessary to get a new JSESSIONID
-        self.jsessionid = None
-        self.jsessionid = self.get_jsessionid(self.username, self.password)
-        
-
     '''
     RSA encrypts plaintext. TP-Link breaks the plaintext down into 64 byte blocks and concatenates the output
     '''
@@ -75,6 +69,7 @@ class VoipDataManager:
             "Referer": f"http://{self.address}",
             "Accept-Language": "en-US,en;q=0.5",
         }
+
         resp = requests.post(f"http://{self.address}/cgi/getGDPRParm", headers=headers)
 
         # Get the RSA public key (i.e. n and e values)
@@ -106,11 +101,6 @@ class VoipDataManager:
     Authenticates with the TP-Link router and return the JSESSIONID
     '''
     def get_jsessionid(self, username, password):
-
-        if time.time() - self.jsessionid_issue_date < 60 * 15 and self.jsessionid is not None: # use the same token within a quarter of an hour
-            return self.jsessionid
-
-        self.jsessionid_issue_date = time.time()
 
         # Get the RSA public key parameters and the sequence
         rsa_vals = self.get_rsa_public_key()
@@ -159,8 +149,6 @@ class VoipDataManager:
             print("[-] Could not find the JSESSIONID in the Set-Cookie filed of the login response")
             return False
         jsessionid = match.group(1)
-
-        print("Session id refreshed")
         
         return jsessionid
 
@@ -178,12 +166,9 @@ class VoipDataManager:
             "Accept-Language": "en-US,en;q=0.5",
         }
         # Check that the JSESSIONID token is up to date
-        try:
-            self.jsessionid = self.get_jsessionid(self.username, self.password)
-        except: 
-            return []   # TODO: return an error message
+        jsessionid = self.get_jsessionid(self.username, self.password)
 
-        cookies = {'JSESSIONID': self.jsessionid}
+        cookies = {'JSESSIONID': jsessionid}
         resp = requests.get(f"http://{self.address}/main/voice_calllog.cgi", headers=headers, cookies=cookies)
         
         res = resp.text[15:-2].replace("\\r\\n", "")   # Remove prefix and suffix
