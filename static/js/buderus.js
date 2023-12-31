@@ -591,9 +591,9 @@ function getHeaderData() {
             // hc parte da 2 in quanto non siamo interessati a hc 1 (piano 0)
             for (let hc = 1; hc < data["temperatureHc"]["setPointAmbiente"].length; hc++) {
 
-                let valSetPointAmbiente = document.createElement("td")
-                let valtemperaturaAmbiente = document.createElement("td")
-                let valtemperaturaMandata = document.createElement("td")
+                let valSetPointAmbiente = document.createElement("td");
+                let valtemperaturaAmbiente = document.createElement("td");
+                let valtemperaturaMandata = document.createElement("td");
 
                 valSetPointAmbiente.innerText = data["temperatureHc"]["setPointAmbiente"][hc] + " °C";
                 valtemperaturaAmbiente.innerText = data["temperatureHc"]["temperaturaAmbiente"][hc] + " °C";

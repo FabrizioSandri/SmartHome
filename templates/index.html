@@ -31,7 +31,7 @@
                         <i class="fas fa-solar-panel fa-7x top_img"></i>
                         <div class="card-body">
                             <h5 class="card-title">Impianto solare</h5>
-                            <p class="card-text">Gestione impianto solare batterie Tesla - resistenza.</p>
+                            <p class="card-text">Impianto solare batterie Tesla - resistenza.</p>
                         </div>
                         <div class="card-footer">
                             <a href="/batteries" class="btn btn-outline-dark btn-lg">Seleziona</a>
@@ -42,7 +42,7 @@
                         <i class="fas fa-cloud-sun fa-7x top_img"></i>
                         <div class="card-body">
                             <h5 class="card-title">Dati meteo</h5>
-                            <p class="card-text">Storico dati meteorologici per la stazione meteo Davis Vantage Vue.</p>
+                            <p class="card-text">Stazione meteo {{ vars["weather_location"] }}.</p>
                         </div>
                         <div class="card-footer">
                             <a href="/weather" class="btn btn-outline-dark btn-lg">Seleziona</a>
@@ -72,10 +72,21 @@
                     </div>
 
                     <div class="card m-2">
+                        <i class="fas fa-phone fa-7x top_img"></i>
+                        <div class="card-body">
+                            <h5 class="card-title">Telefono</h5>
+                            <p class="card-text">Registro chiamate</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/telephone" class="btn btn-outline-dark btn-lg">Seleziona</a>
+                        </div>
+                    </div>
+
+                    <div class="card m-2">
                         <i class="fas fa-cog fa-7x top_img"></i>
                         <div class="card-body">
                             <h5 class="card-title">Impostazioni</h5>
-                            <p class="card-text">Impostazioni valori di configurazione</p>
+                            <p class="card-text">Valori di configurazione</p>
                         </div>
                         <div class="card-footer">
                             <a href="/settings" class="btn btn-outline-dark btn-lg">Seleziona</a>

@@ -7,6 +7,7 @@ class Camera:
 
   def __init__(self, url, numCameras):
     self.cap = cv2.VideoCapture(url)
+    self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     self.numCameras = numCameras
     self.exit_flag = time.time()
     self.lock = Lock()
@@ -14,7 +15,7 @@ class Camera:
     t = Thread(target=self.passiveRead)
     t.daemon = True
     t.start()
-
+  
   # read frames as soon as they are available, keeping only most recent one
   def passiveRead(self):
     while True:
@@ -24,14 +25,13 @@ class Camera:
         self.lock.acquire()
         self.cap.grab()
         self.lock.release()
-        time.sleep(0.01)
+        time.sleep(0.05)
 
   def getFrame(self):
-    self.exit_flag = time.time()
-    
     self.lock.acquire()
     ret, frame = self.cap.read()
     self.lock.release()
+    self.exit_flag = time.time()
 
     # if more than one camera, resize the image
     if int(self.numCameras) > 1:

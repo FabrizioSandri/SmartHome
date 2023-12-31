@@ -21,3 +21,7 @@
 .text-center {
     text-align: center;
 }
+
+#mainContainer {
+    padding-bottom: 2em;
+}
