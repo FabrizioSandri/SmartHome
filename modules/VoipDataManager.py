@@ -75,19 +75,16 @@ class VoipDataManager:
         # Get the RSA public key (i.e. n and e values)
         match = re.search("nn=\"(.+)\"", resp.text)
         if not match:
-            print("[-] Could not find RSA n value in get RSA public key response")
             return None
         n_bytes = match.group(1)
         match = re.search("ee=\"(.+)\"", resp.text)
         if not match:
-            print("[-] Could not find RSA e value in get RSA public key response")
             return None
         e_bytes = match.group(1)
 
         # Get the sequence. This is set to sequence += data_len and verified server-side.
         match = re.search("seq=\"(.+)\"", resp.text)
         if not match:
-            print("[-] Could not find seq value in get RSA public key response")
             return None
         seq_bytes = match.group(1)
 
@@ -105,8 +102,10 @@ class VoipDataManager:
         # Get the RSA public key parameters and the sequence
         rsa_vals = self.get_rsa_public_key()
         if rsa_vals is None:
-            print("[-] Failed to get RSA public key and sequence values")
-            return False
+            rsa_vals = self.get_rsa_public_key()
+            if rsa_vals is None:
+                return "Failed to get RSA public key"
+
         e, n, seq = rsa_vals
 
         # Create the data field
@@ -141,13 +140,12 @@ class VoipDataManager:
         # Get the session cookie
         cookie = resp.headers["Set-Cookie"]
         if cookie is None:
-            print("[-] Login response did not include a Set-Cookie field in the header")
-            return False
+            return "Missing Set-Cookie in the response header"
             
         match = re.search(r"JSESSIONID=([a-z0-9]+)", cookie)
-        if not match:
-            print("[-] Could not find the JSESSIONID in the Set-Cookie filed of the login response")
-            return False
+        if not match:            
+            return "Could not find the JSESSIONID in the response"
+
         jsessionid = match.group(1)
         
         return jsessionid
