@@ -460,7 +460,7 @@ function getConsumedEnergyMonthly() {
             
             let today = new Date();
             if (today.getFullYear() == year && ('0' + (today.getMonth() + 1)).slice(-2) == month){
-                monthlyAverage = monthlyAverage / today.getDate();
+                monthlyAverage = monthlyAverage / (today.getDate() - 1);
             }else{
                 monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
             }
