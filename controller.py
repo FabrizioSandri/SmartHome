@@ -35,13 +35,6 @@ voipDataManager = VoipDataManager(envData["router"]["ip"], envData["router"]["us
 def make_session_permanent():
     session.permanent = True
 
-@app.route('/', methods = ['GET'])
-def index():
-    if session.get("authenticated") :
-        return render_template("index.html", vars=envData["vars"])
-    else: # need to authenticate
-        return render_template("login.html", vars=envData["vars"])
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
@@ -56,6 +49,12 @@ def requires_auth():
                 return render_template("login.html", vars=envData["vars"])
         return decorated
     return wrapper
+
+
+@app.route('/', methods = ['GET'])
+@requires_auth()
+def index():
+    return render_template("index.html", vars=envData["vars"])
 
 #################### LOGIN ####################
 @app.route('/login', methods = ['POST', 'GET'])
@@ -138,7 +137,8 @@ def download_monthly_historical_file():
 
     fileLocationFirstOfMonth = os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}-{year}-{month}-01.csv")
 
-    # se il file del 1 del mese esiste allora ok
+    # if the file for the first of the month does not exist then there is no
+    # data for that specific month
     if os.path.isfile(fileLocationFirstOfMonth):
 
         monthDatasetLocation = WeatherDataManager.getMonthHisoricalFile(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], year, month)
@@ -150,7 +150,7 @@ def download_monthly_historical_file():
     else:
         return "Nessun dato trovato per il mese specificato"
 
-# forecast istantaneo della stazione meteo
+# get forecast icon, sunrise and sunset
 @app.route('/weather/getForecast', methods = ['GET'])
 @requires_auth()
 def getWeatherForecast():
@@ -165,7 +165,7 @@ def getWeatherForecast():
     
     return WeatherDataManager.getForecast(fileLocation)
 
-# get total month rain
+# get monthly rain
 @app.route('/weather/getMonthRain', methods = ['GET'])
 @requires_auth()
 def getMonthRain():
