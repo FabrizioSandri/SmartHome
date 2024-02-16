@@ -50,7 +50,6 @@ def requires_auth():
         return decorated
     return wrapper
 
-
 @app.route('/', methods = ['GET'])
 @requires_auth()
 def index():

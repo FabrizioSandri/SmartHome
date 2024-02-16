@@ -185,8 +185,6 @@ class WeatherDataManager:
 
         data = {firstLine[i]: lastLine[i] for i in range(len(firstLine))}
 
-        data["sunrise"] = datetime.fromtimestamp(int(data["sunrise"])).strftime('%H:%M')
-        data["sunset"] = datetime.fromtimestamp(int(data["sunset"])).strftime('%H:%M')
         data["forecastIcon"] = forecast["forecastIcon"][data["forecastIcon"]]
         data["forecastRule"] = forecast["forecastRule"][data["forecastRule"]]
 
