@@ -43,7 +43,7 @@ def requires_auth():
     def wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            if session.get("authenticated"):
+            if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
                 return f(*args, **kwargs)
             else: # need to authenticate
                 return render_template("login.html", vars=envData["vars"])
@@ -55,7 +55,9 @@ def requires_auth():
 def index():
     return render_template("index.html", vars=envData["vars"])
 
-#################### LOGIN ####################
+################################################################################
+#### AUTHENTICATION 
+################################################################################
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
 
@@ -67,29 +69,29 @@ def login():
         return render_template("login.html", vars=envData["vars"])
 
 
-#################### WEATHER ####################
+################################################################################
+#### WEATHER 
+################################################################################
 @app.route('/weather', methods = ['GET', 'POST'])
 @requires_auth()
 def weather():
     if request.method == 'POST' :
         date = request.form.get("date", None, None)
         precision = request.form.get("precision", None, None)
-
     elif request.method == 'GET':
         date = request.args.get("date", None, None)
         precision = request.args.get("precision", None, None)
     else:
         return "Method not supported"
 
-    # Sanity check for the date 
+    # Missing date 
     if not date:
-        return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"]) 
+        return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"], error="Nessuna data speficata")         
 
     gap = envData["weather"]["default_chart_gap"]
     if precision:
         gap = int(int(precision)/2) # one data point is retrieved once every 2 seconds
         gap = 1 if gap < 1 else gap
-
     try:
         weatherDataManager = WeatherDataManager(envData["weather"]["historical_data_location"], envData["weather"]["historical_data_prefix"], date)
 
@@ -98,7 +100,7 @@ def weather():
         statistics = weatherDataManager.getStatistic(properties)
 
         return render_template("weather.html", chartData=chartData, date=date, statistics=statistics, vars=envData["vars"])
-    except Exception as e: # The user elected a date without existing data
+    except Exception as e: # No data found for the selected date
         return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"], error="Nessun dato trovato per il giorno selezionato.")         
 
 @app.route('/weather/historical', methods = ['GET'])
@@ -187,8 +189,9 @@ def getMonthRain():
     else:
         return "0.0"
 
-#################### BATTERIE ####################
-
+################################################################################
+#### BATTERIES 
+################################################################################
 @app.route('/batteries', methods = ['GET'])
 @requires_auth()
 def batteries():
@@ -204,8 +207,9 @@ def batteries():
 
     return render_template("batteries.html", siteDetails=siteDetails, teslaData=teslaData, vars=envData["vars"])
 
-################## SOLAREDGE ##################
-
+################################################################################
+#### SOLAREDGE 
+################################################################################
 @app.route('/getEnergyProduced', methods = ['GET'])
 @requires_auth()
 def getEnergyProduced():
@@ -313,19 +317,20 @@ def getPowerReducerSchedule():
     return jsonify(powerReducerSchedules)
 
 
-#################### BUDERUS / BOSCH ####################
-
+################################################################################
+#### BUDERUS/BOSCH HEATER
+################################################################################
 @app.route('/buderus', methods = ['GET'])
 @requires_auth()
 def buderus():
-    return render_template("buderus.html", vars=envData["vars"])
+    return render_template("buderus.html")
         
 @app.route('/buderus/getDaillyConsumedEnergy', methods = ['GET'])
 @requires_auth()
 def buderusGetDaillyConsumedEnergy():
 
     date = request.args.get("date", None, None)        
-    if Utilities.checkDate(date) == False: # controllo validita data
+    if Utilities.checkDate(date) == False: # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -335,23 +340,16 @@ def buderusGetDaillyConsumedEnergy():
 
     return jsonify(response)
 
-@app.route('/buderus/saveDaillyConsumedEnergy', methods = ['GET', 'POST'])
+@app.route('/buderus/saveDaillyConsumedEnergy', methods = ['GET'])
+@requires_auth()
 def saveDaillyConsumedEnergy():
-    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
-        if request.method == 'GET':
-            date = request.args.get("date", None, None)
-                        
-            if Utilities.checkDate(date) == False: # controllo validita data
-                return "Data errata"
+    date = request.args.get("date", None, None)
+                
+    if Utilities.checkDate(date) == False: # Check date validity
+        return "Data errata"
 
-            buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-            return str(buderusDataManager.saveDaillyConsumedEnergy(date))
-
-        else:
-            return "Method not supported"
-
-    else: # need to authenticate
-        return render_template("login.html", vars=envData["vars"])
+    buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
+    return str(buderusDataManager.saveDaillyConsumedEnergy(date))
 
 
 @app.route('/buderus/energyConsumedMonthly', methods = ['GET'])
@@ -359,7 +357,7 @@ def saveDaillyConsumedEnergy():
 def buderusEnergyConsumedMonthly():
     
     date = request.args.get("date", None, None)    
-    if Utilities.checkDateNoDay(date) == False: # controllo validita data
+    if Utilities.checkDateNoDay(date) == False: # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -367,19 +365,15 @@ def buderusEnergyConsumedMonthly():
 
 
 @app.route('/buderus/saveEnergyConsumedMonthly', methods = ['GET'])
+@requires_auth()
 def buderusSaveEnergyConsumedMonthly():
-    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret'] :
+    date = request.args.get("date", None, None)
+                
+    if Utilities.checkDateNoDay(date) == False: # Check date validity
+        return "Data errata"
 
-        date = request.args.get("date", None, None)
-                    
-        if Utilities.checkDateNoDay(date) == False: # controllo validita data
-            return "Data errata"
-
-        buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])       
-        return buderusDataManager.saveMonthlyConsumedEnergy(date)
-
-    else: # need to authenticate
-        return render_template("login.html", vars=envData["vars"])
+    buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])       
+    return buderusDataManager.saveMonthlyConsumedEnergy(date)
 
 
 @app.route('/buderus/temperatures', methods = ['GET'])
@@ -388,7 +382,7 @@ def buderusTemperatures():
 
     date = request.args.get("date", None, None)
                 
-    if Utilities.checkDate(date) == False: # controllo validita data
+    if Utilities.checkDate(date) == False: # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -406,7 +400,7 @@ def buderusDownloadMonthlyPowerConsume():
 
     date = year + "-" + month
 
-    if Utilities.checkDateNoDay(date) == False: # controllo validita data
+    if Utilities.checkDateNoDay(date) == False: # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -422,14 +416,10 @@ def buderusgetGeneralData():
 
 
 @app.route('/buderus/saveGeneralInformation', methods = ['GET'])
+@requires_auth()
 def buderusSaveGeneralInformation():
-    if session.get("authenticated") or request.args.get("salt", None, None) == envData['buderus']['download_secret']:
-            
-        buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
-        return buderusDataManager.saveGeneralInformation()
-
-    else: # need to authenticate
-        return render_template("login.html")
+    buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
+    return buderusDataManager.saveGeneralInformation()
 
 
 @app.route('/buderus/getGeneralInformation', methods = ['GET'])
@@ -437,7 +427,7 @@ def buderusSaveGeneralInformation():
 def buderusGetGeneralInformation():
         
     date = request.args.get("date", None, None)           
-    if Utilities.checkDate(date) == False: # controllo validita data
+    if Utilities.checkDate(date) == False: # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -464,8 +454,9 @@ def buderusTesting():
 '''
 
 
-#################### SURVEILLANCE ####################
-
+################################################################################
+#### SURVEILLANCE
+################################################################################
 def gen_frames(videoCaptureSource):  
     while True:
         frame = videoCaptureSource.getFrame()  # read the videoCaptureSource frame
@@ -481,6 +472,7 @@ def surveillance():
 
 
 @app.route('/surveillance/video_feed', methods = ['GET'])
+@requires_auth()
 def video_feed():
     cameraid = request.args.get("cameraid", None, None)
     numCameras = request.args.get("numCameras", None, None) # in order to resize the image
@@ -492,7 +484,10 @@ def video_feed():
     
     return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-#################### SETTINGS ####################
+
+################################################################################
+#### SETTINGS
+################################################################################
 @app.route('/settings', methods = ['GET'])
 @requires_auth()
 def settings():
@@ -598,8 +593,9 @@ def settings_save():
     return "Impostazioni salvate correttamente"
 
 
-#################### VOIP CALL LOG ####################
-
+################################################################################
+#### VOIP CALLS LOG
+################################################################################
 @app.route('/telephone', methods = ['GET'])
 @requires_auth()
 def router():
