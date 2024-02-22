@@ -323,7 +323,7 @@ def getPowerReducerSchedule():
 @app.route('/buderus', methods = ['GET'])
 @requires_auth()
 def buderus():
-    return render_template("buderus.html")
+    return render_template("buderus.html", vars=envData["vars"])
         
 @app.route('/buderus/getDaillyConsumedEnergy', methods = ['GET'])
 @requires_auth()
