@@ -14,7 +14,7 @@ function getCallsLog() {
             let row = document.createElement("tr");
             let calltype = "in ingresso";
             let number;
-            if (call[6] == "1"){  // outgoing
+            if (call[6] == "1"){  // outgoing calls
               number = call[2];
               calltype = "In uscita";
             }else{

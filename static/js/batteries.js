@@ -88,8 +88,8 @@ function changePowerReducerStatus(){
     xhttp.send("status=" + status );
 }
 
-// get weekly power reducer timers AJAX
-function getScheduleTimer() {
+// get weekly power reducer timers
+function generateScheduleTimer() {
 
     document.getElementById("schedule_legend").hidden = false;
     document.getElementById("schedule").innerText = "Attendi, ci vorra' un attimo...";
