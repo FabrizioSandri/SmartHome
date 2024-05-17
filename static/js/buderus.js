@@ -545,11 +545,12 @@ function getConsumedEnergyMonthly() {
                                     borderWidth: 2,
                                     label: {
                                         enabled: true,
-                                        content: "Media",
-                                        backgroundColor: "transparent",
+                                        display: true,
+                                        content: `Media: ${Math.round(monthlyAverage * 100) / 100} kW`,
+                                        backgroundColor: "rgb(255, 255, 255, 0.2)",
                                         color: 'rgb(255, 99, 132)',
-                                        position: "start",
-                                        backgroundColor: "rgba(255,255,255,1)"
+                                        position: "end",
+                                        yAdjust: -12
                                     }
                                 }
                             }
