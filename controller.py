@@ -86,7 +86,7 @@ def weather():
 
     # Missing date 
     if not date:
-        return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"], error="Nessuna data speficata")         
+        return render_template("weather_date.html", vars=envData["vars"], weather=envData["weather"])         
 
     gap = envData["weather"]["default_chart_gap"]
     if precision:
