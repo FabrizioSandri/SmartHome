@@ -191,7 +191,7 @@ function getConsumedEnergyDaily() {
                                         display: true,
                                         text: 'Modulazione - %'
                                     },
-                                    max: 110
+                                    max: Math.max.apply(null, avgGeneralInformation["modulation"]) + 10,
                                 }
                             },
                             plugins: {
@@ -547,10 +547,15 @@ function getConsumedEnergyMonthly() {
                                         enabled: true,
                                         display: true,
                                         content: `Media: ${Math.round(monthlyAverage * 100) / 100} kW`,
-                                        backgroundColor: "rgb(255, 255, 255, 0.2)",
+                                        backgroundColor: "transparent",
                                         color: 'rgb(255, 99, 132)',
                                         position: "end",
-                                        yAdjust: -12
+                                        yAdjust: -12,
+                                        textStrokeColor: '#FFFFFF', 
+                                        textStrokeWidth: 5, 
+                                        font: {
+                                            size: 14,
+                                        }
                                     }
                                 }
                             }
