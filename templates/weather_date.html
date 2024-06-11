@@ -236,8 +236,8 @@
                         document.getElementById("outHumidity").setAttribute("data-value", outHumidity);
                         document.getElementById("heatIndex").innerText = heatIndex;
                         document.getElementById("humIdex").innerText = humIdex;
-                        document.getElementById("sunrise").innerText = sunrise;
-                        document.getElementById("sunset").innerText = sunset;
+                        document.getElementById("sunrise").innerText = "Alba: " + sunrise;
+                        document.getElementById("sunset").innerText = "Tramonto: " + sunset;
                         document.getElementById("lastupdate").innerText = lastUpdate;
                         document.getElementById("cloudbase").setAttribute("data-value", cloudbase);
                         document.getElementById("dayRain").setAttribute("data-value", dayRain);                        
@@ -737,10 +737,10 @@
                 <div class="col-sm-6">
                     <h5>Alba e tramonto</h5>
                     <div class="row justify-content-center align-items-center">
-                        Alba: <span id="sunrise">-</span>
+                        <span id="sunrise">-</span>
                     </div>
                     <div class="row justify-content-center align-items-center">
-                        Tramonto: <span id="sunset">-</span>
+                        <span id="sunset">-</span>
                     </div>
                 </div>
             </div>
