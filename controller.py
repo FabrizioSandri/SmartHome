@@ -478,9 +478,12 @@ def video_feed():
     numCameras = request.args.get("numCameras", None, None) # in order to resize the image
 
     cameraData = envData["surveillance"][cameraid]
-    
-    httpStream = f"http://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['http_port']}/ipcam/mjpeg{cameraData['stream']}.cgi"
-    camera = Camera(httpStream, numCameras)
+    protocol = "http"
+    if cameraData['http_port'] == "554":
+        protocol = "rtsp"
+
+    stream_url = f"{protocol}://{cameraData['username']}:{cameraData['password']}@{cameraData['ip']}:{cameraData['http_port']}{cameraData['stream']}"
+    camera = Camera(stream_url, numCameras)
     
     return Response(gen_frames(camera), mimetype='multipart/x-mixed-replace; boundary=frame')
 

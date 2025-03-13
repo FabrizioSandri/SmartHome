@@ -233,6 +233,7 @@ class BuderusDataManager:
 
         return (fileLocation)
 
+
     '''
     salva i dati mensili della pompa di calore
     '''
