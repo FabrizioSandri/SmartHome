@@ -1,7 +1,6 @@
 from threading import Thread, Lock
 import cv2
 import time
-import queue
 
 class Camera:
 

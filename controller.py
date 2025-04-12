@@ -178,7 +178,6 @@ def getMonthRain():
 
     fileLocationLastOfMonth = Utilities.getLastFileOfMonth(os.path.join(envData["weather"]["historical_data_location"], f"{envData['weather']['historical_data_prefix']}"), month, year)
     if fileLocationLastOfMonth is not None:
-        historical_prefix = envData["weather"]["historical_data_prefix"]
         hisotricalDataLocation = envData["weather"]["historical_data_location"]
         fileLocation = os.path.join(hisotricalDataLocation, fileLocationLastOfMonth)
 
@@ -615,3 +614,7 @@ def telephoneCallsLog():
         else:
             call[6] = 0
     return jsonify(calls)
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
