@@ -5,7 +5,6 @@ import socket
 import time
 from datetime import datetime
 from Utilities import Utilities
-import os
 
 class BatteriesDataManager:
     
@@ -224,9 +223,7 @@ class BatteriesDataManager:
                 if commandResponse.decode("utf-8")[:len(prefix)] == prefix:
                     sock.close()
                     return(commandResponse.decode("utf-8"))
-        except OSError as error : 
-            return 2
-        except expression as identifier:
+        except: 
             return 2
 
         return 0

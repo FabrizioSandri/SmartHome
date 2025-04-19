@@ -6,6 +6,8 @@ from flask import jsonify
 from flask import session
 from flask import Response
 from flask import send_from_directory
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from modules.WeatherDataManager import WeatherDataManager
 from modules.BatteriesDataManager import BatteriesDataManager
@@ -24,7 +26,7 @@ envFile = open("./ENV.json", "r", encoding='utf-8')
 envData = json.load(envFile)
 envFile.close()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static", static_url_path="/static")
 app.secret_key = envData['session_secret_key']
 app.config['SESSION_TYPE'] = 'filesystem'
 
@@ -58,7 +60,10 @@ def index():
 ################################################################################
 #### AUTHENTICATION 
 ################################################################################
+limiter = Limiter(app=app, key_func=get_remote_address, default_limits=[])
+
 @app.route('/login', methods = ['POST', 'GET'])
+@limiter.limit("3 per minute")
 def login():
 
     password = request.form.get("pass", None, None)
@@ -108,24 +113,19 @@ def weather():
 def download_historical_file():
 
     date = request.args.get("datehistorical", None, None)
-    precision = request.args.get("precisionhistorical", envData["weather"]["default_chart_gap"], int)
+    precision = request.args.get("precisionhistorical", envData["weather"]["default_chart_gap"], type=int)
     
+    if not date or not Utilities.is_valid_yyyymmdd(date):
+        return "Unspecified or invalid date", 400 
+
     filename = f"{envData['weather']['historical_data_prefix']}-{date}.csv"
-
-    if filename != ""  and precision:
-        
-        fileLocation = os.path.join(envData["weather"]["historical_data_location"], filename)
-        precision = int(precision)
-        
-        if os.path.isfile(fileLocation):
-            newFileLocation = WeatherDataManager.getFitleredHisoricalFile(fileLocation, precision)
-
-            return send_file(newFileLocation)
-        else:
-            return "File non trovato"
-
-    else:
-        return "Specifica un file e una precisione corretti"
+    base_dir = os.path.abspath(envData["weather"]["historical_data_location"])
+    fileLocation = os.path.join(base_dir, filename)
+    if not os.path.isfile(fileLocation):
+        return "Historical file not found", 404
+    
+    newFileLocation = WeatherDataManager.getFitleredHisoricalFile(fileLocation, precision)
+    return send_file(newFileLocation)
 
 @app.route('/weather/historicalMonth', methods = ['GET'])
 @requires_auth()
@@ -133,6 +133,10 @@ def download_monthly_historical_file():
 
     month = request.args.get("mese", None, None)
     year = request.args.get("anno", None, None)
+
+    if not month or not year or not month.isdigit() or not year.isdigit():
+        return "Invalid dates"
+
     if int(month) < 10:
         month = '0' + month
 
@@ -173,6 +177,9 @@ def getMonthRain():
             
     month = request.args.get("mese", None, None)
     year = request.args.get("anno", None, None)
+    if not month or not year or not month.isdigit() or not year.isdigit():
+        return "0.0"
+    
     if int(month) < 10:
         month = '0' + month
 
@@ -213,7 +220,7 @@ def batteries():
 @requires_auth()
 def getEnergyProduced():
     date = request.args.get("date", None, None)
-    if Utilities.checkDate(date) == False:
+    if not Utilities.checkDate(date):
         return "Data errata"
 
     batteriesDataManager = BatteriesDataManager(session, envData["solaredge"], envData["tesla"], envData["elios4you"])
@@ -228,7 +235,7 @@ def getEnergyProduced():
 def getDailySolarPower():
 
     date = request.args.get("date", None, None)
-    if Utilities.checkDate(date) == False:
+    if not Utilities.checkDate(date):
         return "Data errata"
 
     batteriesDataManager = BatteriesDataManager(session, envData["solaredge"], envData["tesla"], envData["elios4you"])
@@ -329,7 +336,7 @@ def buderus():
 def buderusGetDaillyConsumedEnergy():
 
     date = request.args.get("date", None, None)        
-    if Utilities.checkDate(date) == False: # Check date validity
+    if not Utilities.checkDate(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -344,7 +351,7 @@ def buderusGetDaillyConsumedEnergy():
 def saveDaillyConsumedEnergy():
     date = request.args.get("date", None, None)
                 
-    if Utilities.checkDate(date) == False: # Check date validity
+    if not Utilities.checkDate(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -356,7 +363,7 @@ def saveDaillyConsumedEnergy():
 def buderusEnergyConsumedMonthly():
     
     date = request.args.get("date", None, None)    
-    if Utilities.checkDateNoDay(date) == False: # Check date validity
+    if not Utilities.checkDateNoDay(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -368,7 +375,7 @@ def buderusEnergyConsumedMonthly():
 def buderusSaveEnergyConsumedMonthly():
     date = request.args.get("date", None, None)
                 
-    if Utilities.checkDateNoDay(date) == False: # Check date validity
+    if not Utilities.checkDateNoDay(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])       
@@ -381,7 +388,7 @@ def buderusTemperatures():
 
     date = request.args.get("date", None, None)
                 
-    if Utilities.checkDate(date) == False: # Check date validity
+    if not Utilities.checkDate(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -399,7 +406,7 @@ def buderusDownloadMonthlyPowerConsume():
 
     date = year + "-" + month
 
-    if Utilities.checkDateNoDay(date) == False: # Check date validity
+    if not Utilities.checkDateNoDay(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])
@@ -426,7 +433,7 @@ def buderusSaveGeneralInformation():
 def buderusGetGeneralInformation():
         
     date = request.args.get("date", None, None)           
-    if Utilities.checkDate(date) == False: # Check date validity
+    if not Utilities.checkDate(date): # Check date validity
         return "Data errata"
 
     buderusDataManager = BuderusDataManager(envData["buderus"]["historical_data_location"], envData["buderus"]["gateway_ip"], envData["buderus"]["gateway_secret"], envData["buderus"]["gateway_password"])

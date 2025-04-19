@@ -1,4 +1,5 @@
 import glob
+import re
 
 class Utilities:
 
@@ -27,6 +28,10 @@ class Utilities:
                 dateStr[4] == "-"       and \
                 dateStr[5:7].isdigit() 
     
+    @staticmethod
+    def is_valid_yyyymmdd(date_str):
+        return bool(re.match(r'^\d{4}-\d{2}-\d{2}$', date_str))
+
     @staticmethod
     def getLastFileOfMonth(path, month, year):
         filteredFiles = glob.glob(f"{path}-{year}-{month}-*.csv")
