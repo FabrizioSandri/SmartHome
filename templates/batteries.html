@@ -47,7 +47,7 @@
 
                 <div class="col-md-5">
                     <div class="card">
-                        <h2>Impianto solare casa {{ vars["house_name"] }}</h2>
+                        <h3>Produzione istantanea</h3>
                         <hr />
                         <div>
                             <div class="col">
@@ -111,45 +111,69 @@
                         {% endif %}
                     </div>
                 </div>
-    
-                <!-- DETTAGLI IMPIANTO -->
+                
+                <!-- PRODUZIONE GIORNALIERA -->
                 <div class="col-md-7">
                     <div class="card">
-                        <h2>Dettagli impianto</h2>
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>Energia generata oggi</td>
-                                    <td>{{ siteDetails["lastDayEnergy"] }} kWh</td>
-                                </tr>
-                                <tr>
-                                    <td>Totale energia mensile</td>
-                                    <td>{{ siteDetails["lastMonthEnergy"] }} kWh</td>
-                                </tr>
-                                <tr>
-                                    <td>Totale energia anno</td>
-                                    <td>{{ siteDetails["lastYearEnergy"] }} kWh</td>
-                                </tr>
-                            </tbody>                   
-                        </table>
+                        <div class="container">
+                            <h3>Produzione giornaliera</h3>
+                            <hr />
+                            <!-- Date pickers -->
+                            <div class="row justify-content-center gx-5 align-items-end">
+                                <div class="col-auto form-group">
+                                    <label for="day_production" class="form-label">Data</label>
+                                    <input
+                                        type="date"
+                                        id="day_production"
+                                        class="form-control"
+                                        onchange="generateProductionChartData(false)"
+                                    />
+                                    <span class="input-group-text">
+                                        <strong id="dailyenergygenerated">- kWh</strong>
+                                    </span>
+                                </div>
+                                <div class="col-auto form-group">
+                                    <label for="day_production_compare" class="form-label">Confronta con</label>
+                                    <input
+                                        type="date"
+                                        id="day_production_compare"
+                                        class="form-control"
+                                        onchange="generateProductionChartData(true)"
+                                    />
+                                    <span class="input-group-text">
+                                        <strong id="dailyenergygenerated_compare">- kWh</strong>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- <div class="row justify-content-center">
+                                <button class="btn btn-secondary compare_btn" type="button" onclick="generateProductionChartData(true)">Confronta</button>
+                                <button class="btn btn-alert compare_btn" type="button" onclick="generateProductionChartData(false)">Rimuovi confronto</button>
+                            </div>
+                             -->
+
+                            <canvas id="production-chart"></canvas>
+
+                            
+                        </div>
                     </div>
 
                     <div class="card">
                         <!-- RESISTENZA BOOST -->
                         <div class="container">
-                            <h3>Resistenza ( <span id="reducerstatus"></span><span id="reducerremainingtime"></span> )</h4>
+                            <h3>Resistenza (<span id="reducerstatus"></span><span id="reducerremainingtime"></span>)</h4>
         
                             <div class="row">
                                 
                                 <div class="col col-resistenza">
-                                    <h5>Cambia stato della resistenza</h5>
+                                    <h5>Cambia stato</h5>
                                     <div>
                                         <input type="radio" id="setoff" name="switchresistenza" value="off">
                                         <label for="setoff">Off</label>
                                     </div>
                                     <div>
                                         <input type="radio" id="setauto" name="switchresistenza" value="auto">
-                                        <label for="setauto">Automatico (vedi timer settimanale)</label>
+                                        <label for="setauto">Automatico</label>
                                     </div>
                                     
                                     <input type="button" class="btn btn-secondary" value="Cambia stato" name="changestatus" id="changestatus" onclick="changePowerReducerStatus()">
@@ -176,7 +200,7 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col">
-                                    <button class="btn btn-secondary" onclick="generateScheduleTimer()">Visualizza timer settimanale</button>
+                                    <button class="btn btn-secondary" onclick="generateScheduleTimer()">Visualizza timer automatico</button>
                                 </div>
                             </div>
                             <div class="row" id="schedule_legend" hidden>
@@ -191,57 +215,30 @@
                         </div>
                     </div>
                     
-                    <!-- PRODUZIONE GIORNALIERA -->
+
+                    <!-- DETTAGLI IMPIANTO -->
                     <div class="card">
-                        <div class="container">
-                            <h3>Produzione giornaliera</h3>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5> Energia prodotta in data </h5>
-                                    <div class="row justify-content-center">
-                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(-1, 'day_production')">
-                                            <span class="fas fa-caret-left"></span>
-                                        </button>
-                                        <input class="row" type="date" id="day_production" name="day_production" placeholder="dd-mm-yyyy" onchange="generateProductionChartData(false)">
-                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(1, 'day_production')">
-                                            <span class="fas fa-caret-right"></span>
-                                        </button>
-                                    </div>
-                                    <h5 class="produced_label">
-                                        Produzione: <span id="dailyenergygenerated"></span>
-                                    </h5>
-                                    
-                                </div>
-                                <div class="col-md-6 compare">
-                                    <h5>Confronta con</h5>
-                                    <div class="row justify-content-center">
-                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(-1, 'day_production_compare')">
-                                            <span class="fas fa-caret-left"></span>
-                                        </button>
-                                        <input class="row" type="date" id="day_production_compare" name="day_production_compare" placeholder="dd-mm-yyyy" onchange="generateProductionChartData(true)">
-                                        <button class="btn btn-secondary arrow" type="button" onclick="updateDateDirection(1, 'day_production_compare')">
-                                            <span class="fas fa-caret-right"></span>
-                                        </button>
-                                    </div>
-
-                                    <h5 class="produced_label">
-                                        Produzione: <span id="dailyenergygenerated_compare">0 kWh</span>
-                                    </h5>
-
-                                    <div class="row justify-content-center">
-                                        <button class="btn btn-secondary compare_btn" type="button" onclick="generateProductionChartData(true)">Confronta</button>
-                                        <button class="btn btn-alert compare_btn" type="button" onclick="generateProductionChartData(false)">Rimuovi confronto</button>
-                                    </div>
-                                    
-                                </div>
-                                
-                            </div>
-
-                            <canvas id="production-chart"></canvas>
-
-                            
-                        </div>
+                        <h2>Dettagli produzione</h2>
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>Oggi</td>
+                                    <td>{{ siteDetails["lastDayEnergy"] }} kWh</td>
+                                </tr>
+                                <tr>
+                                    <td>Mese</td>
+                                    <td>{{ siteDetails["lastMonthEnergy"] }} kWh</td>
+                                </tr>
+                                <tr>
+                                    <td>Anno</td>
+                                    <td>{{ siteDetails["lastYearEnergy"] }} kWh</td>
+                                </tr>
+                            </tbody>                   
+                        </table>
                     </div>
+
+                    
+                    
                 </div>
 
             </div>

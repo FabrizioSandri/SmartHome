@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 from datetime import datetime
 from functools import wraps
 
@@ -84,8 +85,8 @@ limiter = Limiter(app=app, key_func=get_remote_address, default_limits=[])
 @app.route("/login", methods=["POST", "GET"])
 @limiter.limit("3 per minute")
 def login():
-    password = request.form.get("pass", None, None)
-    if password and password == envData["interface_password"]:
+    password = request.form.get("pass", "", type=str)
+    if password and hashlib.sha256(password.encode('utf-8')).hexdigest() == envData["interface_password"]:
         session["authenticated"] = True
         return render_template("index.html", vars=envData["vars"])
     else:
