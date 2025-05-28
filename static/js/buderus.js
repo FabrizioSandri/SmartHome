@@ -76,12 +76,6 @@ function getConsumedEnergyDaily() {
             xhttp2.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200){
 
-                    if (this.responseText.toString() == "-1"){
-                        $('#errormodal').modal('show');
-                        document.getElementById("error_res").innerText = "Errore di rete.";
-                        return;
-                    }
-
                     let generalInformation = JSON.parse(this.responseText)
                     let avgGeneralInformation = getAverages(generalInformation, date)
             
@@ -211,6 +205,11 @@ function getConsumedEnergyDaily() {
                         }
                     });
                     
+                }else if(this.readyState == 4 && this.status != 200){
+                    res = JSON.parse(this.responseText);
+                    $('#errormodal').modal('show');
+                    document.getElementById("error_res").innerText = res["error"];
+                    return;
                 }
             }
             

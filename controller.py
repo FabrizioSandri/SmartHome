@@ -180,11 +180,11 @@ def download_historical_file():
 @app.route("/weather/historicalMonth", methods=["GET"])
 @requires_auth()
 def download_monthly_historical_file():
-    month = request.args.get("mese", None, None)
-    year = request.args.get("anno", None, None)
+    month = request.args.get("mese", "", type=str)
+    year = request.args.get("anno", "", type=str)
 
     if not month or not year or not month.isdigit() or not year.isdigit():
-        return "Invalid dates"
+        return jsonify({"error": "Invalid date format"}), 400
 
     if int(month) < 10:
         month = "0" + month
@@ -206,10 +206,10 @@ def download_monthly_historical_file():
         if monthDatasetLocation != 0:
             return send_file(monthDatasetLocation)
         else:
-            return "Errore nell'estrazione dei dati"
+            return jsonify({"error": "Unable to extract the data"}), 400
 
     else:
-        return "Nessun dato trovato per il mese specificato"
+        return jsonify({"error": "No data found for the specified month"}), 400
 
 
 # get forecast icon, sunrise and sunset
@@ -231,8 +231,8 @@ def getWeatherForecast():
 @app.route("/weather/getMonthRain", methods=["GET"])
 @requires_auth()
 def getMonthRain():
-    month = request.args.get("mese", None, None)
-    year = request.args.get("anno", None, None)
+    month = request.args.get("mese", "", type=str)
+    year = request.args.get("anno", "", type=str)
     if not month or not year or not month.isdigit() or not year.isdigit():
         return "0.0"
 
@@ -290,9 +290,9 @@ def batteries():
 @app.route("/getEnergyProduced", methods=["GET"])
 @requires_auth()
 def getEnergyProduced():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", None, type=str)
     if not Utilities.checkDate(date):
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     batteriesDataManager = BatteriesDataManager(
         session, envData["solaredge"], envData["tesla"], envData["elios4you"]
@@ -306,9 +306,9 @@ def getEnergyProduced():
 @app.route("/getDailySolarPower", methods=["GET"])
 @requires_auth()
 def getDailySolarPower():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", None, type=str)
     if not Utilities.checkDate(date):
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     batteriesDataManager = BatteriesDataManager(
         session, envData["solaredge"], envData["tesla"], envData["elios4you"]
@@ -319,8 +319,6 @@ def getDailySolarPower():
 
 
 #################### TESLA ####################
-
-
 @app.route("/batteryPercentage", methods=["GET"])
 @requires_auth()
 def batteryPercentage():
@@ -349,23 +347,21 @@ def batteriesUsageChart():
 
 
 #################### ELIOS4YOU ####################
-
-
 @app.route("/boost", methods=["POST"])
 @requires_auth()
 def boost():
-    endTime = request.form.get("endtime", None, None)
+    endTime = request.form.get("endtime", None, type=str)
 
     batteriesDataManager = BatteriesDataManager(
         session, envData["solaredge"], envData["tesla"], envData["elios4you"]
     )
     res = batteriesDataManager.boost(endTime)
     if res == 1:
-        return "Boost avviato"
+        return jsonify({"msg": "Boost enabled"}), 200
     elif res == 0:
-        return "Fornisci un orario corretto"
+        return jsonify({"error": "Please provide a valid signal"}), 400
     else:
-        return "Errore di connessione con il dispositivo E4U"
+        return jsonify({"error": "Connection error with E4U device."}), 400
 
 
 @app.route("/e4u_data", methods=["GET"])
@@ -377,9 +373,9 @@ def e4u_data():
     e4uOnlineData = batteriesDataManager.getOnlineData()
 
     if e4uOnlineData == 0:
-        return jsonify({"error": "Errore di connessione con il dispositivo E4U"})
+        return jsonify({"error": "Connection error with E4U device."}), 400
     elif e4uOnlineData == 2:
-        return jsonify({"error": "Segnale debole"})
+        return jsonify({"error": "Weak signal."}), 400
     else:
         return jsonify(e4uOnlineData)
 
@@ -387,16 +383,18 @@ def e4u_data():
 @app.route("/changePowerReducerStatus", methods=["POST"])
 @requires_auth()
 def changePowerReducerStatus():
-    status = request.args.get("status", None, None)
+    status = request.args.get("status", default="off", type=str)
+    if status not in ["auto", "off"]:
+        return jsonify({"error": "Invalid status provided. Supported values: auto, off"}), 400
 
     batteriesDataManager = BatteriesDataManager(
         session, envData["solaredge"], envData["tesla"], envData["elios4you"]
     )
     res = batteriesDataManager.changePowerReducerStatus(status)
     if res == 1:
-        return "Stato aggiornato"
+        return jsonify({"msg": "Status successfully changed"}), 200
     else:
-        return "Errore di connessione con il dispositivo E4U"
+        return jsonify({"error": "Connection error with E4U device."}), 400
 
 
 @app.route("/getPowerReducerSchedule", methods=["GET"])
@@ -408,7 +406,7 @@ def getPowerReducerSchedule():
     powerReducerSchedules = batteriesDataManager.getPowerReducerSchedules()
 
     if powerReducerSchedules[0] == 2:
-        return "Segnale dispositivo E4U assente"
+        return jsonify({"error": "Connection error with E4U device."}), 400
 
     return jsonify(powerReducerSchedules)
 
@@ -421,13 +419,12 @@ def getPowerReducerSchedule():
 def buderus():
     return render_template("buderus.html", vars=envData["vars"])
 
-
 @app.route("/buderus/getDaillyConsumedEnergy", methods=["GET"])
 @requires_auth()
 def buderusGetDaillyConsumedEnergy():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", "", type=str)
     if not Utilities.checkDate(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -436,19 +433,16 @@ def buderusGetDaillyConsumedEnergy():
         envData["buderus"]["gateway_password"],
     )
     response = buderusDataManager.getDaillyConsumedEnergy(date)
-    if response == -1:
-        return response
-
     return jsonify(response)
 
 
 @app.route("/buderus/saveDaillyConsumedEnergy", methods=["GET"])
 @requires_auth()
 def saveDaillyConsumedEnergy():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", "", type=str)
 
     if not Utilities.checkDate(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -462,9 +456,9 @@ def saveDaillyConsumedEnergy():
 @app.route("/buderus/energyConsumedMonthly", methods=["GET"])
 @requires_auth()
 def buderusEnergyConsumedMonthly():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", "", type=str)
     if not Utilities.checkDateNoDay(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -478,10 +472,10 @@ def buderusEnergyConsumedMonthly():
 @app.route("/buderus/saveEnergyConsumedMonthly", methods=["GET"])
 @requires_auth()
 def buderusSaveEnergyConsumedMonthly():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", "", type=str)
 
     if not Utilities.checkDateNoDay(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -495,10 +489,10 @@ def buderusSaveEnergyConsumedMonthly():
 @app.route("/buderus/temperatures", methods=["GET"])
 @requires_auth()
 def buderusTemperatures():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", None, type=str)
 
     if not Utilities.checkDate(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -512,8 +506,8 @@ def buderusTemperatures():
 @app.route("/buderus/downloadMonthlyPowerConsume", methods=["GET"])
 @requires_auth()
 def buderusDownloadMonthlyPowerConsume():
-    month = request.args.get("mese", None, None)
-    year = request.args.get("anno", None, None)
+    month = request.args.get("mese", "", type=str)
+    year = request.args.get("anno", "", type=str)
 
     if int(month) < 10:
         month = "0" + month
@@ -521,7 +515,7 @@ def buderusDownloadMonthlyPowerConsume():
     date = year + "-" + month
 
     if not Utilities.checkDateNoDay(date):  # Check date validity
-        return "Data errata"
+        return jsonify({"error": "Invalid date format"}), 400
 
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
@@ -559,10 +553,10 @@ def buderusSaveGeneralInformation():
 @app.route("/buderus/getGeneralInformation", methods=["GET"])
 @requires_auth()
 def buderusGetGeneralInformation():
-    date = request.args.get("date", None, None)
+    date = request.args.get("date", default="", type=str)
     if not Utilities.checkDate(date):  # Check date validity
-        return "Data errata"
-
+        return jsonify({"error": "Invalid date format"}), 400
+    
     buderusDataManager = BuderusDataManager(
         envData["buderus"]["historical_data_location"],
         envData["buderus"]["gateway_ip"],
@@ -570,8 +564,6 @@ def buderusGetGeneralInformation():
         envData["buderus"]["gateway_password"],
     )
     response = buderusDataManager.getGeneralInformation(date)
-    if response == -1:
-        return -1
 
     return jsonify(response)
 
@@ -615,10 +607,13 @@ def surveillance():
 @app.route("/surveillance/video_feed", methods=["GET"])
 @requires_auth()
 def video_feed():
-    cameraid = request.args.get("cameraid", None, None)
+    cameraid = request.args.get("cameraid", default="", type=str)
     numCameras = request.args.get(
-        "numCameras", None, None
+        "numCameras", default=1, type=int
     )  # in order to resize the image
+
+    if cameraid not in envData["surveillance"]:
+        return jsonify({"error": "Invalid camera provided"}), 400
 
     cameraData = envData["surveillance"][cameraid]
     protocol = "http"
@@ -633,9 +628,9 @@ def video_feed():
     )
 
 
-################################################################################
-#### SETTINGS
-################################################################################
+###############################################################################
+### SETTINGS
+###############################################################################
 @app.route("/settings", methods=["GET"])
 @requires_auth()
 def settings():
@@ -701,123 +696,123 @@ def settings():
     )
 
 
-@app.route("/settings/save", methods=["POST"])
-@requires_auth()
-def settings_save():
-    old_password = request.form.get("old_password", default=None)
-    if old_password != envData["interface_password"]:
-        return "Password errata, non sei autorizzato a modificre le impostazioni"
+# @app.route("/settings/save", methods=["POST"])
+# @requires_auth()
+# def settings_save():
+#     old_password = request.form.get("old_password", default=None)
+#     if old_password != envData["interface_password"]:
+#         return "Password errata, non sei autorizzato a modificre le impostazioni"
 
-    interface_password = request.form.get(
-        "interface_password", default=envData["interface_password"]
-    )
-    house_name = request.form.get("house_name", default=envData["vars"]["house_name"])
-    weather_location = request.form.get(
-        "weather_location", default=envData["vars"]["weather_location"]
-    )
-    weather_historical_data_location = request.form.get(
-        "weather_historical_data_location",
-        default=envData["weather"]["historical_data_location"],
-    )
-    historical_data_prefix = request.form.get(
-        "historical_data_prefix", default=envData["weather"]["historical_data_prefix"]
-    )
-    default_chart_gap = request.form.get(
-        "default_chart_gap", default=envData["weather"]["default_chart_gap"], type=int
-    )
-    download_secret = request.form.get(
-        "download_secret", default=envData["buderus"]["download_secret"]
-    )
-    buderus_gateway_ip = request.form.get(
-        "buderus_gateway_ip", default=envData["buderus"]["gateway_ip"]
-    )
-    gateway_secret = (
-        envData["buderus"]["gateway_secret"]
-        if len(request.form.get("gateway_secret")) == 0
-        else request.form.get(
-            "gateway_secret", default=envData["buderus"]["gateway_secret"]
-        )
-    )
-    buderus_gateway_password = (
-        envData["buderus"]["gateway_password"]
-        if len(request.form.get("buderus_gateway_password")) == 0
-        else request.form.get(
-            "buderus_gateway_password", default=envData["buderus"]["gateway_password"]
-        )
-    )
-    buderus_historical_data_location = request.form.get(
-        "buderus_historical_data_location",
-        default=envData["buderus"]["historical_data_location"],
-    )
-    api_key = request.form.get("api_key", default=envData["solaredge"]["api_key"])
-    site_id = request.form.get("site_id", default=envData["solaredge"]["site_id"])
-    tesla_gateway_ip = request.form.get(
-        "tesla_gateway_ip", default=envData["tesla"]["gateway_ip"]
-    )
-    gateway_email = request.form.get(
-        "gateway_email", default=envData["tesla"]["gateway_email"]
-    )
-    tesla_gateway_password = (
-        envData["tesla"]["gateway_password"]
-        if len(request.form.get("gateway_password")) == 0
-        else request.form.get(
-            "gateway_password", default=envData["tesla"]["gateway_password"]
-        )
-    )
-    device_ip = request.form.get("device_ip", default=envData["elios4you"]["device_ip"])
-    device_port = request.form.get(
-        "device_port", default=envData["elios4you"]["device_port"], type=int
-    )
+#     interface_password = request.form.get(
+#         "interface_password", default=envData["interface_password"]
+#     )
+#     house_name = request.form.get("house_name", default=envData["vars"]["house_name"])
+#     weather_location = request.form.get(
+#         "weather_location", default=envData["vars"]["weather_location"]
+#     )
+#     weather_historical_data_location = request.form.get(
+#         "weather_historical_data_location",
+#         default=envData["weather"]["historical_data_location"],
+#     )
+#     historical_data_prefix = request.form.get(
+#         "historical_data_prefix", default=envData["weather"]["historical_data_prefix"]
+#     )
+#     default_chart_gap = request.form.get(
+#         "default_chart_gap", default=envData["weather"]["default_chart_gap"], type=int
+#     )
+#     download_secret = request.form.get(
+#         "download_secret", default=envData["buderus"]["download_secret"]
+#     )
+#     buderus_gateway_ip = request.form.get(
+#         "buderus_gateway_ip", default=envData["buderus"]["gateway_ip"]
+#     )
+#     gateway_secret = (
+#         envData["buderus"]["gateway_secret"]
+#         if len(request.form.get("gateway_secret")) == 0
+#         else request.form.get(
+#             "gateway_secret", default=envData["buderus"]["gateway_secret"]
+#         )
+#     )
+#     buderus_gateway_password = (
+#         envData["buderus"]["gateway_password"]
+#         if len(request.form.get("buderus_gateway_password")) == 0
+#         else request.form.get(
+#             "buderus_gateway_password", default=envData["buderus"]["gateway_password"]
+#         )
+#     )
+#     buderus_historical_data_location = request.form.get(
+#         "buderus_historical_data_location",
+#         default=envData["buderus"]["historical_data_location"],
+#     )
+#     api_key = request.form.get("api_key", default=envData["solaredge"]["api_key"])
+#     site_id = request.form.get("site_id", default=envData["solaredge"]["site_id"])
+#     tesla_gateway_ip = request.form.get(
+#         "tesla_gateway_ip", default=envData["tesla"]["gateway_ip"]
+#     )
+#     gateway_email = request.form.get(
+#         "gateway_email", default=envData["tesla"]["gateway_email"]
+#     )
+#     tesla_gateway_password = (
+#         envData["tesla"]["gateway_password"]
+#         if len(request.form.get("gateway_password")) == 0
+#         else request.form.get(
+#             "gateway_password", default=envData["tesla"]["gateway_password"]
+#         )
+#     )
+#     device_ip = request.form.get("device_ip", default=envData["elios4you"]["device_ip"])
+#     device_port = request.form.get(
+#         "device_port", default=envData["elios4you"]["device_port"], type=int
+#     )
 
-    for cam in range(1, len(envData["surveillance"]) + 1):
-        cam_name = request.form.get("cam%d_name_hidden" % cam, default=None)
-        envData["surveillance"][cam_name]["ip"] = request.form.get(
-            "cam%d_ip" % cam, default=envData["surveillance"][cam_name]["ip"]
-        )
-        envData["surveillance"][cam_name]["http_port"] = request.form.get(
-            "cam%d_http_port" % cam,
-            default=envData["surveillance"][cam_name]["http_port"],
-        )
-        envData["surveillance"][cam_name]["username"] = request.form.get(
-            "cam%d_username" % cam,
-            default=envData["surveillance"][cam_name]["username"],
-        )
-        envData["surveillance"][cam_name]["password"] = (
-            envData["surveillance"][cam_name]["password"]
-            if len(request.form.get("cam%d_password" % cam)) == 0
-            else request.form.get(
-                "cam%d_password" % cam,
-                default=envData["surveillance"][cam_name]["password"],
-            )
-        )
-        envData["surveillance"][cam_name]["stream"] = request.form.get(
-            "cam%d_stream" % cam, default=envData["surveillance"][cam_name]["stream"]
-        )
+#     for cam in range(1, len(envData["surveillance"]) + 1):
+#         cam_name = request.form.get("cam%d_name_hidden" % cam, default=None)
+#         envData["surveillance"][cam_name]["ip"] = request.form.get(
+#             "cam%d_ip" % cam, default=envData["surveillance"][cam_name]["ip"]
+#         )
+#         envData["surveillance"][cam_name]["http_port"] = request.form.get(
+#             "cam%d_http_port" % cam,
+#             default=envData["surveillance"][cam_name]["http_port"],
+#         )
+#         envData["surveillance"][cam_name]["username"] = request.form.get(
+#             "cam%d_username" % cam,
+#             default=envData["surveillance"][cam_name]["username"],
+#         )
+#         envData["surveillance"][cam_name]["password"] = (
+#             envData["surveillance"][cam_name]["password"]
+#             if len(request.form.get("cam%d_password" % cam)) == 0
+#             else request.form.get(
+#                 "cam%d_password" % cam,
+#                 default=envData["surveillance"][cam_name]["password"],
+#             )
+#         )
+#         envData["surveillance"][cam_name]["stream"] = request.form.get(
+#             "cam%d_stream" % cam, default=envData["surveillance"][cam_name]["stream"]
+#         )
 
-    envData["interface_password"] = interface_password
-    envData["vars"]["house_name"] = house_name
-    envData["vars"]["weather_location"] = weather_location
-    envData["weather"]["historical_data_location"] = weather_historical_data_location
-    envData["weather"]["historical_data_prefix"] = historical_data_prefix
-    envData["weather"]["default_chart_gap"] = default_chart_gap
-    envData["buderus"]["download_secret"] = download_secret
-    envData["buderus"]["gateway_ip"] = buderus_gateway_ip
-    envData["buderus"]["gateway_secret"] = gateway_secret
-    envData["buderus"]["gateway_password"] = buderus_gateway_password
-    envData["buderus"]["historical_data_location"] = buderus_historical_data_location
-    envData["solaredge"]["api_key"] = api_key
-    envData["solaredge"]["site_id"] = site_id
-    envData["tesla"]["gateway_ip"] = tesla_gateway_ip
-    envData["tesla"]["gateway_email"] = gateway_email
-    envData["tesla"]["gateway_password"] = tesla_gateway_password
-    envData["elios4you"]["device_ip"] = device_ip
-    envData["elios4you"]["device_port"] = device_port
+#     envData["interface_password"] = interface_password
+#     envData["vars"]["house_name"] = house_name
+#     envData["vars"]["weather_location"] = weather_location
+#     envData["weather"]["historical_data_location"] = weather_historical_data_location
+#     envData["weather"]["historical_data_prefix"] = historical_data_prefix
+#     envData["weather"]["default_chart_gap"] = default_chart_gap
+#     envData["buderus"]["download_secret"] = download_secret
+#     envData["buderus"]["gateway_ip"] = buderus_gateway_ip
+#     envData["buderus"]["gateway_secret"] = gateway_secret
+#     envData["buderus"]["gateway_password"] = buderus_gateway_password
+#     envData["buderus"]["historical_data_location"] = buderus_historical_data_location
+#     envData["solaredge"]["api_key"] = api_key
+#     envData["solaredge"]["site_id"] = site_id
+#     envData["tesla"]["gateway_ip"] = tesla_gateway_ip
+#     envData["tesla"]["gateway_email"] = gateway_email
+#     envData["tesla"]["gateway_password"] = tesla_gateway_password
+#     envData["elios4you"]["device_ip"] = device_ip
+#     envData["elios4you"]["device_port"] = device_port
 
-    envFile = open("./ENV.json", "w")
-    json.dump(envData, envFile, indent=4, ensure_ascii=False)
-    envFile.close()
+#     envFile = open("./ENV.json", "w")
+#     json.dump(envData, envFile, indent=4, ensure_ascii=False)
+#     envFile.close()
 
-    return "Impostazioni salvate correttamente"
+#     return "Impostazioni salvate correttamente"
 
 
 ################################################################################
@@ -845,4 +840,4 @@ def telephoneCallsLog():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=80)

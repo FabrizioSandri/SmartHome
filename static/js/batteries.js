@@ -28,8 +28,14 @@ function getBatteryPercentage(){
 function sendBoost(){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200){
-            document.getElementById("boostresult").innerHTML = this.responseText;
+        if (this.readyState == 4){
+            res = JSON.parse(this.responseText);
+            if (this.status == 200){
+                document.getElementById("boostresult").innerHTML = res["msg"];
+            }else{
+                document.getElementById("boostresult").innerHTML = res["error"];
+            }
+        }else if(this.readyState == 4 && this.status != 200){
         }
     }
     

@@ -280,7 +280,7 @@ class BatteriesDataManager:
         if result == 2:
             return 2
         
-        return(1)
+        return 1
 
     '''
     ottiene gli schedule giornalieri per la resistenza per tutta la settimana
