@@ -52,7 +52,7 @@ class BatteriesDataManager:
 
         while(firstLoop or ("code" in jsonResponse and jsonResponse["code"] == 401)):
             
-            if firstLoop==False: # generate a new AuthCookie on the second loop (error code 401)
+            if firstLoop is False: # generate a new AuthCookie on the second loop (error code 401)
                 try:
                     self.getAuthCookie() 
                 except Exception as e:
