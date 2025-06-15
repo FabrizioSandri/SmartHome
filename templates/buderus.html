@@ -127,10 +127,13 @@
                     <h4>Dati mensili</h4>
                 </div>
                 <div class="col-md-9">
-                    <label for="mese">Mese: </label>
-                    <select id="mese" name="mese"></select>
-                    <select id="anno" name="anno"></select>
-                    <input type="submit" name="getDataMonthly" class="btn btn-secondary" value="Visualizza dati" onclick="getConsumedEnergyMonthly()">
+                    <form method="GET" action="/buderus/downloadMonthlyPowerConsume">
+                        <label for="mese">Mese: </label>
+                        <select id="mese" name="mese"></select>
+                        <select id="anno" name="anno"></select>
+                        <button type="button" name="getDataMonthly" class="btn btn-secondary" onclick="getConsumedEnergyMonthly()">Visualizza dati</button>
+                        <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
+                    </form>                    
                 </div>
             </div>
             
@@ -141,19 +144,8 @@
                     <canvas id="energyConsumedMonthly-chart"></canvas>
                 </div>
                 <div class="col-lg-6 text-center pt-3">
-                    <h5>Download dati</h5>
-                    <p>
-                        Selezionare il mese e anno di cui si vogliono scaricare i dati. 
-                    </p>
-        
-                    <form method="GET" action="/buderus/downloadMonthlyPowerConsume">
-                        
-                        <select id="mesedownload" name="mese"></select>
-                        <select id="annodownload" name="anno"></select>
-        
-                        <input type="submit" value="Scarica" class="btn btn-secondary" name="downloadmonthly">
-        
-                    </form>
+                    <h5>Storico energia consumata</h5>
+                    <canvas id="total-energy-chart"></canvas>
                 </div>
             </div>
         </div>
@@ -184,11 +176,11 @@
             getHeaderData();
             displayDailyCharts();
             generateOptionsMonthly("mese", "anno");
-            generateOptionsMonthly("mesedownload", "annodownload");
 
             document.getElementById("mese").value = today.getMonth() + 1;
             document.getElementById("anno").value = today.getFullYear();
             getConsumedEnergyMonthly();
+            getTotalMonthlyConsumedEnergy();
         </script>
     </body>
 </html>

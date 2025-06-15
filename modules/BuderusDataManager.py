@@ -41,8 +41,6 @@ class BuderusDataManager:
     def decrypt(self, enc):
         if enc and len(enc) > 2:
             enc = base64.b64decode(enc)
-            if len(enc) % self.BS != 0:
-                enc = _pad(enc)
             cipher = Decrypter(
                 AESModeOfOperationECB(self.key),
                 padding=PADDING_NONE)
@@ -277,6 +275,39 @@ class BuderusDataManager:
             return json.dumps(consumedEnergy)
 
         return 0
+    
+    def getTotalMonthlyConsumedEnergy(self):
+        """
+        Scan all files named 'YYYYMM_buderus.csv' in self.historical_data_location,
+        compute the sum of the second column (kW consumed) for each month,
+        and return a JSON string mapping 'YYYY-MM' -> total_kW.
+        """
+        averages = {}
+
+        for fname in os.listdir(self.historical_data_location):
+            if not fname.endswith("_buderus.csv"):
+                continue
+
+            basename = fname[:-len("_buderus.csv")]
+            if len(basename) != 6 or not basename.isdigit():
+                continue
+
+            year = basename[:4]
+            month = basename[4:6]
+            key = f"{year}-{month}"
+
+            path = os.path.join(self.historical_data_location, fname)
+            try:
+                df = pd.read_csv(path)
+                print(df)
+                avg = df.iloc[:, 1].sum()
+            except Exception as e:
+                print(e)
+                continue
+
+            averages[key] = round(float(avg), 2)
+        print(averages)
+        return averages
 
     '''
     ottiene dati generali sull'impianto

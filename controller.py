@@ -470,6 +470,19 @@ def buderusEnergyConsumedMonthly():
     return str(buderusDataManager.getMonthlyConsumedEnergyFromFile(date))
 
 
+@app.route("/buderus/totalMonthlyConsumedEnergy", methods=["GET"])
+@requires_auth()
+def buderusenergyConsumedTotal():
+   
+    buderusDataManager = BuderusDataManager(
+        envData["buderus"]["historical_data_location"],
+        envData["buderus"]["gateway_ip"],
+        envData["buderus"]["gateway_secret"],
+        envData["buderus"]["gateway_password"],
+    )
+    return jsonify(buderusDataManager.getTotalMonthlyConsumedEnergy())
+
+
 @app.route("/buderus/saveEnergyConsumedMonthly", methods=["GET"])
 @requires_auth()
 def buderusSaveEnergyConsumedMonthly():
@@ -524,7 +537,11 @@ def buderusDownloadMonthlyPowerConsume():
         envData["buderus"]["gateway_secret"],
         envData["buderus"]["gateway_password"],
     )
-    return send_file(buderusDataManager.getMonthlyConsumedEnergyFile(date))
+    file_location = buderusDataManager.getMonthlyConsumedEnergyFile(date)
+    if not os.path.exists(file_location):
+        return jsonify({"error": "No data found for the specified date"}), 400
+    
+    return send_file(file_location)
 
 
 @app.route("/buderus/getGeneralData", methods=["GET"])

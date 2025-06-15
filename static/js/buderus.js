@@ -1,6 +1,7 @@
 let dailyConsumedEnergyChart;
 let monthlyConsumedEnergyChart;
 let dailyTemperaturesChart;
+let monthlyEnergyChart;
 
 function getAverages(generalInformation, date) {
 
@@ -460,7 +461,7 @@ function getConsumedEnergyMonthly() {
             let today = new Date();
             if (today.getFullYear() == year && ('0' + (today.getMonth() + 1)).slice(-2) == month){
                 // if the current month, then consider until yesterday
-                monthlyAverage = monthlyAverage / today.getDate() - 1;
+                monthlyAverage = monthlyAverage / (today.getDate() - 1);
             }else{
                 monthlyAverage = monthlyAverage / consumedEnergy.measure.length;
             }
@@ -613,5 +614,132 @@ function getHeaderData() {
     }
     
     xhttp.open("GET", "buderus/getGeneralData", true);
+    xhttp.send();
+}
+
+
+
+function getTotalMonthlyConsumedEnergy() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            if (this.responseText.toString() == "-1") {
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = "Nessun dato trovato per il mese selezionato.";
+                return;
+            }
+
+            let data = JSON.parse(this.responseText);
+
+            // Group data by year
+            const groupedData = {};
+            Object.entries(data).forEach(([key, value]) => {
+                const [year, month] = key.split("-");
+                if (!groupedData[year]) groupedData[year] = {};
+                groupedData[year][month] = value;
+            });
+
+            // Create unified month labels (1-12)
+            const monthLabels = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+            const displayLabels = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+
+            // Generate datasets
+            const colors = ["#0e9aa7", "#f3622d", "#fbab25", "#57b757", "#1e3aa7", "#9b59b6"];
+            let colorIndex = 0;
+            const datasets = Object.keys(groupedData).sort().map((year) => {
+                const monthlyData = monthLabels.map((m) => 
+                    groupedData[year].hasOwnProperty(m) ? groupedData[year][m] : null
+                );
+                const color = colors[colorIndex++ % colors.length];
+
+                return {
+                    data: monthlyData,
+                    label: year,
+                    borderColor: color,
+                    backgroundColor: color,
+                    fill: false,
+                    borderWidth: 2.2,
+                    pointRadius: 3,
+                    pointHoverRadius: 3,
+                    cubicInterpolationMode: 'monotone',
+                    tension: 0.4
+                };
+            });
+
+            // Destroy previous chart if it exists
+            if (monthlyEnergyChart) {
+                monthlyEnergyChart.destroy();
+            }
+
+            monthlyEnergyChart = new Chart("total-energy-chart", {
+                type: 'custom_line',
+                data: {
+                    labels: displayLabels,
+                    datasets: datasets
+                },
+                options: {
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x'
+                    },
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Mese'
+                            },
+                            grid: {
+                                color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Energia Cons. (kWh)'
+                            },
+                            grid: {
+                                color: "#7F7F7F"
+                            },
+                            border: {
+                                dash: [8, 4]
+                            },
+                            ticks: {
+                                count: 6
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            intersect: false,
+                            callbacks: {
+                                title: function (TooltipItems) {
+                                    return `Mese: ${TooltipItems[0].label}`;
+                                },
+                                label: function (TooltipItem) {
+                                    return `${TooltipItem.dataset.label}: ${TooltipItem.formattedValue} kWh`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+        } else if (this.readyState == 4 && this.status != 200) {
+            if (this.responseText.toString() == "-1") {
+                $('#errormodal').modal('show');
+                document.getElementById("error_res").innerText = this.responseText;
+                return;
+            }
+        }
+    };
+
+    xhttp.open("GET", "buderus/totalMonthlyConsumedEnergy", true);
     xhttp.send();
 }
